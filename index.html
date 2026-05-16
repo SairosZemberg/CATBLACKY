@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CatBlack - Canal seguro de transmissão">
+    <title>CatBlack</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'Courier New', 'Consolas', 'Monaco', 'Lucida Console', monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #main-wrapper {
+            transition: opacity 2s ease-in-out;
+            opacity: 1;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px 20px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        #main-wrapper.faded {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .ascii-art {
+            white-space: pre;
+            font-size: 13px;
+            line-height: 1.25;
+            color: #dddddd;
+            margin: 0 auto;
+            text-align: center;
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
+        @media (max-width: 600px) {
+            .ascii-art {
+                font-size: 10px;
+                line-height: 1.15;
+            }
+        }
+
+        #fox-art {
+            margin-bottom: 5px;
+        }
+
+        #cat-art {
+            margin: 25px auto;
+            min-height: 120px;
+            color: #cccccc;
+        }
+
+        #welcome-text {
+            color: #eeeeee;
+            font-size: 16px;
+            margin: 15px auto 30px;
+            text-align: center;
+            min-height: 24px;
+            max-width: 700px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 600px) {
+            #welcome-text {
+                font-size: 14px;
+            }
+        }
+
+        #input-section {
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+            pointer-events: none;
+            margin: 10px auto 30px;
+            width: 100%;
+            max-width: 650px;
+            display: none;
+        }
+
+        #input-section.visible {
+            display: block;
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        #message-input {
+            width: 100%;
+            background-color: transparent;
+            border: 1px solid #555555;
+            color: #ffffff;
+            font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
+            font-size: 15px;
+            padding: 14px;
+            caret-color: #ffffff;
+            outline: none;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+
+        #message-input:focus {
+            border-color: #ffffff;
+        }
+
+        #message-input::placeholder {
+            color: #444444;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background-color: transparent;
+            border: 1px solid #666666;
+            color: #aaaaaa;
+            font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            padding: 10px 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            border-color: #ffffff;
+            color: #ffffff;
+            background-color: #111111;
+        }
+
+        button:active {
+            background-color: #222222;
+        }
+
+        .confirmation-box, .response-box {
+            border: 1px solid #444444;
+            padding: 25px;
+            margin: 25px auto;
+            max-width: 650px;
+            background-color: #050505;
+            width: 100%;
+            line-height: 1.6;
+        }
+
+        .confirmation-box p, .response-box p {
+            margin-bottom: 10px;
+            color: #bbbbbb;
+        }
+
+        .key-highlight {
+            color: #ffffff;
+            font-weight: bold;
+            border: 1px solid #ffffff;
+            padding: 3px 8px;
+            margin: 0 4px;
+            display: inline-block;
+        }
+
+        .response-text {
+            color: #dddddd;
+            font-style: italic;
+            margin: 12px 0;
+            padding-left: 20px;
+            border-left: 2px solid #444444;
+            word-wrap: break-word;
+        }
+
+        .puzzle-text {
+            color: #999999;
+            margin: 12px 0;
+            padding: 12px;
+            border: 1px dashed #444444;
+            word-wrap: break-word;
+        }
+
+        .status-ok {
+            color: #44ff44;
+        }
+
+        .status-wait {
+            color: #ffaa44;
+        }
+
+        .status-err {
+            color: #ff4444;
+        }
+
+        .idle-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #cccccc;
+            font-size: 1.6rem;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+            pointer-events: none;
+            z-index: 1000;
+            width: 90%;
+            max-width: 600px;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 600px) {
+            .idle-message {
+                font-size: 1.2rem;
+            }
+        }
+
+        .idle-message.visible {
+            opacity: 1;
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 30px 20px;
+            text-align: center;
+            color: #555555;
+            font-size: 12px;
+            border-top: 1px solid #111111;
+            width: 100%;
+            letter-spacing: 0.5px;
+        }
+
+        .eye-trigger {
+            cursor: pointer;
+            color: #777777;
+            transition: color 0.4s;
+            text-decoration: none;
+            user-select: none;
+        }
+
+        .eye-trigger:hover {
+            color: #ffffff;
+        }
+
+        #hidden-section {
+            display: none;
+            width: 100%;
+            max-width: 950px;
+            margin: 0 auto;
+            padding: 0 20px 50px;
+        }
+
+        .hidden-cipher {
+            color: #000000;
+            background-color: #000000;
+            font-family: 'Courier New', 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            padding: 25px;
+            user-select: text;
+            -webkit-user-select: text;
+            word-wrap: break-word;
+            border: 1px solid #000000;
+        }
+
+        .hidden-cipher::selection {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        .hidden-cipher::-moz-selection {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        #admin-panel {
+            display: none;
+            width: 100%;
+            max-width: 950px;
+            margin: 30px auto;
+            padding: 0 20px 50px;
+        }
+
+        .admin-header {
+            color: #ffffff;
+            font-size: 18px;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            border-bottom: 1px solid #333333;
+            padding-bottom: 10px;
+        }
+
+        .admin-message-item {
+            border: 1px solid #222222;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #050505;
+        }
+
+        .msg-header {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .msg-key {
+            color: #ffffff;
+            font-weight: bold;
+            border: 1px solid #ffffff;
+            padding: 2px 6px;
+        }
+
+        .msg-date {
+            color: #666666;
+        }
+
+        .msg-status {
+            color: #ff4444;
+        }
+
+        .msg-status.answered {
+            color: #44ff44;
+        }
+
+        .msg-content {
+            color: #bbbbbb;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #0a0a0a;
+            border-left: 2px solid #444444;
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+
+        .admin-reply-form label {
+            display: block;
+            color: #888888;
+            font-size: 12px;
+            margin: 10px 0 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .admin-reply-form textarea {
+            width: 100%;
+            background-color: #0a0a0a;
+            border: 1px solid #333333;
+            color: #ffffff;
+            margin-bottom: 10px;
+            padding: 10px;
+            font-family: 'Courier New', 'Consolas', monospace;
+            font-size: 13px;
+            outline: none;
+            resize: vertical;
+        }
+
+        .admin-reply-form textarea:focus {
+            border-color: #555555;
+        }
+
+        .admin-reply-form button {
+            margin-top: 5px;
+        }
+
+        .admin-hint {
+            color: #333333;
+            font-size: 11px;
+            margin-top: 10px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #000000;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333333;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555555;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="idle-text-1" class="idle-message">Por que você está aqui?</div>
+    <div id="idle-text-2" class="idle-message">Gostaria de perguntar algo?</div>
+
+    <div id="main-wrapper">
+
+        <pre id="fox-art" class="ascii-art">⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡀⠀⠀⠀
+⠀⠀⠀ ⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⠙⠻⢶⣄⡀⠀⠀⠀⢀⣤⠶⠛⠛⡇⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⣇⠀⠀⣙⣿⣦⣤⣴⣿⣁⠀⠀⣸⠇⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣡⣾⣿⣿⣿⣿⣿⣿⣿⣷⣌⠋⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣴⣿⣷⣄⡈⢻⣿⡟⢁⣠⣾⣿⣦⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⣿⣿⣿⣿⠘⣿⠃⣿⣿⣿⣿⡏⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠀⠈⠛⣰⠿⣆⠛⠁⠀⡀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣼⣿⣦⠀⠘⠛⠋⠀⣴⣿⠁⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣤⣶⣾⣿⣿⣿⣿⡇⠀⠀⠀⢸⣿⣏⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⣠⣶⣿⣿⣿⣿⣿⣿⣿⣿⠿⠿⠀⠀⠀⠾⢿⣿⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⣠⣿⣿⣿⣿⣿⣿⡿⠟⠋⣁⣠⣤⣤⡶⠶⠶⣤⣄⠈⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⢰⣿⣿⣮⣉⣉⣉⣤⣴⣶⣿⣿⣋⡥⠄⠀⠀⠀⠀⠉⢻⣄⠀⠀⠀⠀⠀
+⠀⠀⠀⠸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣟⣋⣁⣤⣀⣀⣤⣤⣤⣤⣄⣿⡄⠀⠀⠀⠀
+⠀⠀⠀⠀⠙⠿⣿⣿⣿⣿⣿⣿⣿⡿⠿⠛⠋⠉⠁⠀⠀⠀⠀⠈⠛⠃⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠉⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+┎┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┒
+    Login n°8-20-20-16-19://4-9-19-3-15-18-4-4-7-7/10-11-20-26-20-6-4-26-6  
+┖┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┚</pre>
+
+        <pre id="cat-art" class="ascii-art"></pre>
+
+        <div id="welcome-text"></div>
+
+        <div id="input-section">
+            <input
+                type="text"
+                id="message-input"
+                placeholder="Digite sua mensagem ou insira sua chave de 8 caracteres..."
+                autocomplete="off"
+                spellcheck="false"
+                maxlength="500"
+            >
+            <div class="button-group">
+                <button id="send-btn" title="Enviar nova mensagem anônima">Transmitir</button>
+                <button id="check-btn" title="Verificar resposta vinculada a uma chave">Verificar Chave</button>
+            </div>
+        </div>
+
+        <div id="confirmation-section" style="display:none;"></div>
+        <div id="response-section" style="display:none;"></div>
+
+    </div>
+
+    <div id="admin-panel">
+        <div class="admin-header">Painel do Host // Acesso Restrito</div>
+        <div id="messages-list"></div>
+        <div class="admin-hint">Pressione Ctrl+Shift+A para ocultar este painel.</div>
+    </div>
+
+    <div id="hidden-section">
+        <div class="hidden-cipher">BAABA AABAA ABBAA AABBB ABBAB AABAA BABAB AAAAA BAABA AAAAA BAAAB BAAAB AABAA ABAAA BAAAB ABABB AABAA BAAAB AABAA BAAAB AABAA BAAAB AABAA ABAAA BAAAB AAABB ABAAA AAAAA BAAAB AABAA ABBAA BAABA BAAAA AABAA AAAAA BAAAB BAABB ABBAB BABBB AABAA BAAAB ABBBB BAABB AABAA AABAA AAABA ABBAB AAAAA ABABB BAABA AABAA ABABB ABBAB ABBBB BAABB AABAA ABBAA ABBAB AAABB ABAAA AABBA AAAAA ABABB ABBAB ABBBB BAABB AABAA AABAA BAAAB BAABA ABBAB BAABB ABBBA BAAAA AABAA BAAAB BAABA AABAA BAAAB AAAAA AABAB AAAAA BABBB AABAA BAAAA ABBBA ABBAB ABAAA BAAAB ABABB AABAA BAAAB ABABB ABBAB AAABB ABAAA AAAAA ABBAA BAABA AABAA AAABB AABAA BAABA AAAAA ABAAA BAAAB BAAAB ABAAA BAAAB ABAAA ABBAA AABAA ABBBA BAABA ABBAB BAAAB ABBBA BAAAA ABBAB AAABA BAABB BAAAA AAAAA BAAAA AABAA ABAAA AAAAA AAAAA AABAB ABAAA BAAAA ABABB AAAAA ABBAB AAABA ABBAB AABAA BAAAA AABAA ABBAA BAABA AABAA</div>
+    </div>
+
+    <footer>
+        <span id="current-date"></span> | 404 | The Host | <span class="eye-trigger" id="eye-trigger" title="Clique para revelar">You see 👁️?</span> | <span id="creation-date">16.05.2026</span>
+    </footer>
+
+    <script>
+    (function() {
+        'use strict';
+
+        // ============================================================
+        // CONFIGURAÇÕES DO SISTEMA
+        // ============================================================
+        const CONFIG = {
+            adminEmail: 'antonny135121215@proton.me',
+            creationDate: '16.05.2026',
+            inactivityDelay1: 60000,
+            inactivityDelay2: 60000,
+            typingSpeedCat: 20,
+            typingSpeedWelcome: 35,
+            keyLength: 8,
+            maxInputLength: 500,
+            // =========================================================
+            // CONFIGURAÇÃO DE ENVIO REAL DE E-MAIL
+            // =========================================================
+            // Opção 1 — Formspree (recomendado, sem backend):
+            // 1. Acesse https://formspree.io e crie uma conta gratuita.
+            // 2. Crie um novo formulário e defina o e-mail de destino
+            //    como: antonny135121215@proton.me
+            // 3. Copie o endpoint (ex: https://formspree.io/f/xnqkvnzy)
+            //    e cole abaixo na variável formspreeEndpoint.
+            // 4. Suba este HTML em qualquer hospedagem estática (GitHub Pages,
+            //    Netlify, Vercel, etc.) e o envio funcionará imediatamente.
+            // =========================================================
+            formspreeEndpoint: 'https://formspree.io/f/meedjazp',
+            // =========================================================
+            // Opção 2 — Backend próprio (controle total):
+            // Se preferir não depender de terceiros, use o arquivo
+            // server.js fornecido junto. Configure-o em um VPS ou
+            // plataforma como Render/Railway, aponte o domínio abaixo
+            // e descomente a linha do fetch no backendSend().
+            // =========================================================
+            backendUrl: ''
+        };
+
+        // ============================================================
+        // ESTADO GLOBAL
+        // ============================================================
+        let db = { messages: [] };
+        let typingComplete = false;
+        let inactivityTimer1 = null;
+        let inactivityTimer2 = null;
+        let isIdle = false;
+        let adminVisible = false;
+
+        // ============================================================
+        // REFERÊNCIAS DOM
+        // ============================================================
+        const els = {
+            mainWrapper: document.getElementById('main-wrapper'),
+            foxArt: document.getElementById('fox-art'),
+            catArt: document.getElementById('cat-art'),
+            welcomeText: document.getElementById('welcome-text'),
+            inputSection: document.getElementById('input-section'),
+            input: document.getElementById('message-input'),
+            sendBtn: document.getElementById('send-btn'),
+            checkBtn: document.getElementById('check-btn'),
+            confirmation: document.getElementById('confirmation-section'),
+            response: document.getElementById('response-section'),
+            idle1: document.getElementById('idle-text-1'),
+            idle2: document.getElementById('idle-text-2'),
+            currentDate: document.getElementById('current-date'),
+            eyeTrigger: document.getElementById('eye-trigger'),
+            hiddenSection: document.getElementById('hidden-section'),
+            adminPanel: document.getElementById('admin-panel'),
+            messagesList: document.getElementById('messages-list')
+        };
+
+        // ============================================================
+        // BANCO DE DADOS LOCAL
+        // ============================================================
+        function initDB() {
+            try {
+                const stored = localStorage.getItem('CATBLACK_DB');
+                if (stored) {
+                    db = JSON.parse(stored);
+                    if (!db.messages) db.messages = [];
+                }
+            } catch (e) {
+                console.warn('[CatBlack] Erro ao carregar DB local:', e);
+                db = { messages: [] };
+            }
+        }
+
+        function saveDB() {
+            try {
+                localStorage.setItem('CATBLACK_DB', JSON.stringify(db));
+            } catch (e) {
+                console.error('[CatBlack] Erro ao salvar DB:', e);
+            }
+        }
+
+        // ============================================================
+        // UTILITÁRIOS
+        // ============================================================
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function generateKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let key = '';
+            for (let i = 0; i < CONFIG.keyLength; i++) {
+                key += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            if (db.messages.some(function(m) { return m.key === key; })) {
+                return generateKey();
+            }
+            return key;
+        }
+
+        function isValidKeyFormat(text) {
+            return text && text.length === CONFIG.keyLength && /^[A-Z0-9]+$/.test(text);
+        }
+
+        // ============================================================
+        // ENVIO REAL DE E-MAIL
+        // ============================================================
+        async function backendSend(data) {
+            const payload = {
+                key: data.key,
+                message: data.message,
+                timestamp: data.timestamp,
+                _replyto: 'no-reply@catblack.local',
+                _subject: 'CatBlack :: Transmissão [' + data.key + ']'
+            };
+
+            // Montar corpo legível para o administrador
+            const emailBody =
+                '=== TRANSMISSÃO CATBLACK ===' + '\n' +
+                'Chave: ' + data.key + '\n' +
+                'Data: ' + new Date(data.timestamp).toLocaleString('pt-BR') + '\n' +
+                'Origem: ' + window.location.href + '\n' +
+                '===========================' + '\n\n' +
+                data.message + '\n\n' +
+                '===========================' + '\n' +
+                'Responda pelo painel admin do site usando a chave acima.';
+
+            // --- OPÇÃO 1: Formspree (sem backend próprio) ---
+            if (CONFIG.formspreeEndpoint && CONFIG.formspreeEndpoint.indexOf('SEU_ENDPOINT') === -1) {
+                try {
+                    const formData = new FormData();
+                    formData.append('email', CONFIG.adminEmail);
+                    formData.append('subject', payload._subject);
+                    formData.append('message', emailBody);
+                    // Campo oculto anti-spam do Formspree
+                    formData.append('_gotcha', '');
+
+                    const res = await fetch(CONFIG.formspreeEndpoint, {
+                        method: 'POST',
+                        body: formData,
+                        headers: { 'Accept': 'application/json' }
+                    });
+
+                    if (res.ok) {
+                        console.log('%c[CatBlack] E-mail encaminhado via Formspree.', 'color: #44ff44;');
+                        return { success: true, via: 'formspree' };
+                    } else {
+                        console.warn('[CatBlack] Formspree respondeu com status:', res.status);
+                    }
+                } catch (err) {
+                    console.error('[CatBlack] Falha no envio Formspree:', err);
+                }
+            }
+
+            // --- OPÇÃO 2: Backend próprio ---
+            if (CONFIG.backendUrl) {
+                try {
+                    const res = await fetch(CONFIG.backendUrl + '/api/transmit', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            to: CONFIG.adminEmail,
+                            subject: payload._subject,
+                            text: emailBody,
+                            key: data.key
+                        })
+                    });
+                    if (res.ok) {
+                        console.log('%c[CatBlack] E-mail encaminhado via backend próprio.', 'color: #44ff44;');
+                        return { success: true, via: 'backend' };
+                    }
+                } catch (err) {
+                    console.error('[CatBlack] Falha no envio backend:', err);
+                }
+            }
+
+            // --- Fallback: apenas log no console (modo local) ---
+            console.log('%c[CatBlack] MODO LOCAL — E-mail NÃO enviado.', 'color: #ffaa44; font-weight: bold;');
+            console.log('Destino:', CONFIG.adminEmail);
+            console.log('Chave:', data.key);
+            console.log('Timestamp:', data.timestamp);
+            console.log('Payload:', data.message);
+            console.log('%cConfigure o endpoint Formspree ou o backend para envio real.', 'color: #888; font-style: italic;');
+            return { success: false, via: 'local' };
+        }
+
+        // ============================================================
+        // EFEITO TYPEWRITER
+        // ============================================================
+        function typeWriter(element, text, speed) {
+            return new Promise(function(resolve) {
+                if (!element || !text) {
+                    resolve();
+                    return;
+                }
+                element.textContent = '';
+                let i = 0;
+                function type() {
+                    if (i < text.length) {
+                        element.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(type, speed);
+                    } else {
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+
+        // ============================================================
+        // SEQUÊNCIA DE ABERTURA
+        // ============================================================
+        async function initSequence() {
+            var catLines = [
+                "‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ╱|、",
+                "                          (˚ˎ 。7  ",
+                "                           |、˜〵          ",
+                "                          じしˍ,)ノ"
+            ];
+            var catText = catLines.join("\n");
+
+            await typeWriter(els.catArt, catText, CONFIG.typingSpeedCat);
+
+            var welcomeMsg = 'Bem-Vindo(a) ao CatBlack! Um espaço para envios de cartas. Digite sua mensagem abaixo:';
+            await typeWriter(els.welcomeText, welcomeMsg, CONFIG.typingSpeedWelcome);
+
+            els.inputSection.style.display = 'block';
+            void els.inputSection.offsetWidth;
+            els.inputSection.classList.add('visible');
+
+            typingComplete = true;
+            startInactivityMonitor();
+        }
+
+        // ============================================================
+        // MONITORAMENTO DE INATIVIDADE
+        // ============================================================
+        function startInactivityMonitor() {
+            resetInactivity();
+        }
+
+        function resetInactivity() {
+            clearTimeout(inactivityTimer1);
+            clearTimeout(inactivityTimer2);
+
+            if (isIdle) {
+                isIdle = false;
+                els.mainWrapper.classList.remove('faded');
+                els.idle1.classList.remove('visible');
+                els.idle2.classList.remove('visible');
+            }
+
+            if (typingComplete) {
+                inactivityTimer1 = setTimeout(function() {
+                    isIdle = true;
+                    els.mainWrapper.classList.add('faded');
+                    els.idle1.classList.add('visible');
+
+                    inactivityTimer2 = setTimeout(function() {
+                        els.idle1.classList.remove('visible');
+                        els.idle2.classList.add('visible');
+                    }, CONFIG.inactivityDelay2);
+                }, CONFIG.inactivityDelay1);
+            }
+        }
+
+        var activityEvents = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click', 'wheel'];
+        activityEvents.forEach(function(evt) {
+            window.addEventListener(evt, resetInactivity, { passive: true });
+        });
+
+        // ============================================================
+        // LÓGICA DE ENVIO E RECEBIMENTO
+        // ============================================================
+        async function handleTransmit() {
+            var text = els.input.value.trim();
+            if (!text) return;
+
+            if (isValidKeyFormat(text)) {
+                var existing = db.messages.find(function(m) { return m.key === text; });
+                if (existing) {
+                    showResponse(existing);
+                    els.input.value = '';
+                    return;
+                }
+            }
+
+            var key = generateKey();
+            var messageData = {
+                key: key,
+                message: text,
+                timestamp: new Date().toISOString(),
+                response: null,
+                nextPuzzle: null,
+                answered: false
+            };
+
+            db.messages.push(messageData);
+            saveDB();
+
+            // Enviar e-mail real para o administrador
+            var sendResult = await backendSend(messageData);
+
+            showConfirmation(key, text, sendResult);
+            els.input.value = '';
+        }
+
+        function handleCheckKey() {
+            var text = els.input.value.trim();
+            if (!text) return;
+
+            if (!isValidKeyFormat(text)) {
+                els.response.innerHTML =
+                    '<div class="response-box">' +
+                    '<p><span class="status-err">> FORMATO INVÁLIDO.</span></p>' +
+                    '<p>> A chave deve conter exatamente ' + CONFIG.keyLength + ' caracteres alfanuméricos maiúsculos.</p>' +
+                    '<p>> Exemplo válido: A1B2C3D4</p>' +
+                    '</div>';
+                els.response.style.display = 'block';
+                els.confirmation.style.display = 'none';
+                return;
+            }
+
+            var existing = db.messages.find(function(m) { return m.key === text; });
+            if (existing) {
+                showResponse(existing);
+                els.input.value = '';
+            } else {
+                els.response.innerHTML =
+                    '<div class="response-box">' +
+                    '<p><span class="status-err">> CHAVE NÃO RECONHECIDA.</span></p>' +
+                    '<p>> O código "' + escapeHtml(text) + '" não foi localizado no sistema.</p>' +
+                    '<p>> Verifique se digitou corretamente ou transmita uma nova mensagem.</p>' +
+                    '</div>';
+                els.response.style.display = 'block';
+                els.confirmation.style.display = 'none';
+            }
+        }
+
+        function showConfirmation(key, message, sendResult) {
+            var viaText = '';
+            if (sendResult && sendResult.via === 'formspree') {
+                viaText = '<p><span class="status-ok">> Canal de transmissão ativo. Payload encaminhado.</span></p>';
+            } else if (sendResult && sendResult.via === 'backend') {
+                viaText = '<p><span class="status-ok">> Canal de transmissão ativo. Payload encaminhado via backend seguro.</span></p>';
+            } else {
+                viaText = '<p><span class="status-wait">> Canal de transmissão local. Configure o endpoint para envio real.</span></p>';
+            }
+
+            els.confirmation.innerHTML =
+                '<div class="confirmation-box">' +
+                '<p><span class="status-ok">> TRANSMISSÃO EFETUADA COM SUCESSO.</span></p>' +
+                viaText +
+                '<p>> Conteúdo registrado: "' + escapeHtml(message) + '"</p>' +
+                '<p>> Chave de decodificação exclusiva: <span class="key-highlight">' + key + '</span></p>' +
+                '<p>> Guarde esta chave em local seguro. Ela é sua única conexão com o Host.</p>' +
+                '<p>> Aguarde retorno.</p>' +
+                '</div>';
+            els.confirmation.style.display = 'block';
+            els.response.style.display = 'none';
+        }
+
+        function showResponse(data) {
+            var html =
+                '<div class="response-box">' +
+                '<p>> Chave <span class="key-highlight">' + data.key + '</span> reconhecida no sistema.</p>';
+
+            if (!data.response) {
+                html +=
+                    '<p><span class="status-wait">> Status: Aguardando resposta do Host.</span></p>' +
+                    '<p>> Nenhuma transmissão de retorno foi vinculada a esta chave até o momento.</p>' +
+                    '<p>> Retorne posteriormente.</p>';
+            } else {
+                html +=
+                    '<p><span class="status-ok">> Transmissão recebida do Host:</span></p>' +
+                    '<p class="response-text">"' + escapeHtml(data.response) + '"</p>';
+                if (data.nextPuzzle) {
+                    html +=
+                        '<p>> Próximo desdobramento vinculado:</p>' +
+                        '<p class="puzzle-text">' + escapeHtml(data.nextPuzzle) + '</p>';
+                }
+                html += '<p>> Fim da transmissão.</p>';
+            }
+
+            html += '</div>';
+            els.response.innerHTML = html;
+            els.response.style.display = 'block';
+            els.confirmation.style.display = 'none';
+        }
+
+        // ============================================================
+        // RODAPÉ E DATA DINÂMICA
+        // ============================================================
+        function updateCurrentDate() {
+            var now = new Date();
+            var day = String(now.getDate()).padStart(2, '0');
+            var month = String(now.getMonth() + 1).padStart(2, '0');
+            var year = now.getFullYear();
+            els.currentDate.textContent = day + '.' + month + '.' + year;
+        }
+
+        // ============================================================
+        // SEÇÃO OCULTA (Bacon Cipher)
+        // ============================================================
+        els.eyeTrigger.addEventListener('click', function() {
+            var isHidden = els.hiddenSection.style.display === 'none' || !els.hiddenSection.style.display;
+            if (isHidden) {
+                els.hiddenSection.style.display = 'block';
+                setTimeout(function() {
+                    els.hiddenSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            } else {
+                els.hiddenSection.style.display = 'none';
+            }
+        });
+
+        // ============================================================
+        // PAINEL ADMINISTRATIVO OCULTO
+        // ============================================================
+        function toggleAdminPanel() {
+            adminVisible = !adminVisible;
+            els.adminPanel.style.display = adminVisible ? 'block' : 'none';
+            if (adminVisible) {
+                renderAdminMessages();
+                setTimeout(function() {
+                    els.adminPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+                e.preventDefault();
+                toggleAdminPanel();
+            }
+        });
+
+        if (window.location.hash === '#admin') {
+            setTimeout(toggleAdminPanel, 1500);
+        }
+
+        function renderAdminMessages() {
+            if (!els.messagesList) return;
+
+            if (db.messages.length === 0) {
+                els.messagesList.innerHTML = '<p style="color:#444;">Nenhuma transmissão recebida no sistema.</p>';
+                return;
+            }
+
+            var sorted = db.messages.slice().sort(function(a, b) {
+                return new Date(b.timestamp) - new Date(a.timestamp);
+            });
+
+            els.messagesList.innerHTML = sorted.map(function(m, idx) {
+                var realIndex = db.messages.indexOf(m);
+                return (
+                    '<div class="admin-message-item" data-real-index="' + realIndex + '">' +
+                    '<div class="msg-header">' +
+                    '<span class="msg-key">[' + m.key + ']</span>' +
+                    '<span class="msg-date">' + new Date(m.timestamp).toLocaleString('pt-BR') + '</span>' +
+                    '<span class="msg-status ' + (m.answered ? 'answered' : '') + '">' + (m.answered ? 'RESPONDIDO' : 'PENDENTE') + '</span>' +
+                    '</div>' +
+                    '<div class="msg-content">' + escapeHtml(m.message) + '</div>' +
+                    '<div class="admin-reply-form">' +
+                    '<label>Resposta do Host para o remetente:</label>' +
+                    '<textarea id="resp-' + realIndex + '" rows="3" placeholder="Digite a resposta...">' + escapeHtml(m.response || '') + '</textarea>' +
+                    '<label>Próximo enigma ou instrução:</label>' +
+                    '<textarea id="puz-' + realIndex + '" rows="2" placeholder="Digite o próximo desdobramento...">' + escapeHtml(m.nextPuzzle || '') + '</textarea>' +
+                    '<button onclick="window.catblackSaveResponse(' + realIndex + ')">Vincular Resposta à Chave</button>' +
+                    '</div>' +
+                    '</div>'
+                );
+            }).join('');
+        }
+
+        window.catblackSaveResponse = function(index) {
+            var respEl = document.getElementById('resp-' + index);
+            var puzEl = document.getElementById('puz-' + index);
+            if (!respEl || !puzEl) return;
+
+            var response = respEl.value.trim();
+            var puzzle = puzEl.value.trim();
+
+            db.messages[index].response = response || null;
+            db.messages[index].nextPuzzle = puzzle || null;
+            db.messages[index].answered = !!response;
+
+            saveDB();
+            renderAdminMessages();
+
+            var item = document.querySelector('[data-real-index="' + index + '"]');
+            if (item) {
+                item.style.borderColor = '#ffffff';
+                setTimeout(function() {
+                    item.style.borderColor = '#222222';
+                }, 800);
+            }
+        };
+
+        // ============================================================
+        // EVENT LISTENERS DOS BOTÕES PRINCIPAIS
+        // ============================================================
+        els.sendBtn.addEventListener('click', handleTransmit);
+        els.checkBtn.addEventListener('click', handleCheckKey);
+
+        els.input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleTransmit();
+            }
+        });
+
+        // ============================================================
+        // INICIALIZAÇÃO DA APLICAÇÃO
+        // ============================================================
+        initDB();
+        updateCurrentDate();
+        setTimeout(initSequence, 600);
+        setInterval(updateCurrentDate, 60000);
+
+        console.log('%cCatBlack // Sistema Inicializado', 'color: #666; font-family: monospace;');
+
+    })();
+    </script>
+</body>
+</html>
