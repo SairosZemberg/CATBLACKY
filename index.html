@@ -409,6 +409,8 @@
             background: #555555;
         }
     </style>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <base target="_blank">
 </head>
 <body>
@@ -466,6 +468,14 @@
             <div class="admin-header" style="border:none; padding:0; margin:0;">Painel do Host // Acesso Restrito</div>
             <button onclick="window.catblackClearAnswered()" style="margin:0;" title="Apagar todas as mensagens já respondidas">Limpar Respondidas</button>
         </div>
+        <div style="margin-bottom:25px; padding:15px; border:1px solid #222222; background:#050505;">
+            <p style="color:#888; font-size:12px; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px;">Receber transmissão externa</p>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <input type="text" id="admin-import-key" placeholder="Digite a chave de 8 caracteres..." maxlength="8" style="flex:1; min-width:200px; background:#0a0a0a; border:1px solid #333; color:#fff; padding:10px; font-family:'Courier New',monospace; font-size:13px; outline:none;">
+                <button onclick="window.catblackImportByKey()" style="margin:0;">Receber por Chave</button>
+            </div>
+            <p id="admin-import-status" style="color:#444; font-size:11px; margin-top:8px; min-height:16px;"></p>
+        </div>
         <div id="messages-list"></div>
         <div class="admin-hint">Pressione Ctrl+Shift+A para ocultar este painel.</div>
     </div>
@@ -518,6 +528,28 @@
         };
 
         // ============================================================
+        // CONFIGURAÇÃO FIREBASE (sincronização entre dispositivos)
+        // ============================================================
+        // 1. Acesse https://console.firebase.google.com e crie um projeto.
+        // 2. Ative o Realtime Database (modo teste / público para iniciar).
+        // 3. Copie as credenciais abaixo (Configuração do SDK > CDN).
+        // 4. Substitua os valores placeholder abaixo pelos seus reais.
+        // ============================================================
+        const FIREBASE_CONFIG = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
+            projectId: "SEU_PROJETO",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "000000000000",
+            appId: "1:000000000000:web:0000000000000000000000"
+        };
+
+        let firebaseApp = null;
+        let messagesRef = null;
+        let firebaseEnabled = false;
+
+        // ============================================================
         // ESTADO GLOBAL
         // ============================================================
         let db = { messages: [] };
@@ -553,8 +585,40 @@
         };
 
         // ============================================================
-        // BANCO DE DADOS LOCAL
+        // BANCO DE DADOS — Firebase (nuvem) com fallback local
         // ============================================================
+        function initFirebase() {
+            try {
+                const cfg = FIREBASE_CONFIG;
+                const isPlaceholder = !cfg.databaseURL || cfg.databaseURL.indexOf('SEU_PROJETO') !== -1;
+                if (isPlaceholder) {
+                    console.log('%c[CatBlack] Firebase não configurado. Usando modo local.', 'color: #ffaa44;');
+                    initDB();
+                    return;
+                }
+                firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
+                messagesRef = firebase.database().ref('catblack/messages');
+                firebaseEnabled = true;
+
+                messagesRef.on('value', function(snapshot) {
+                    const data = snapshot.val();
+                    db.messages = data ? Object.values(data) : [];
+                    if (currentViewedKey) {
+                        var msg = db.messages.find(function(m) { return m.key === currentViewedKey; });
+                        if (msg && msg.response !== lastKnownResponse) {
+                            showResponse(msg);
+                        }
+                    }
+                    if (adminVisible) renderAdminMessages();
+                });
+
+                console.log('%c[CatBlack] Firebase ativo. Sincronização em tempo real habilitada.', 'color: #44ff44;');
+            } catch (e) {
+                console.warn('[CatBlack] Falha ao iniciar Firebase:', e);
+                initDB();
+            }
+        }
+
         function initDB() {
             try {
                 const stored = localStorage.getItem('CATBLACK_DB');
@@ -569,10 +633,19 @@
         }
 
         function saveDB() {
-            try {
-                localStorage.setItem('CATBLACK_DB', JSON.stringify(db));
-            } catch (e) {
-                console.error('[CatBlack] Erro ao salvar DB:', e);
+            if (firebaseEnabled && messagesRef) {
+                var messagesObj = {};
+                db.messages.forEach(function(m, i) {
+                    var id = m.key ? 'msg_' + m.key : 'msg_' + i + '_' + Date.now();
+                    messagesObj[id] = m;
+                });
+                messagesRef.set(messagesObj);
+            } else {
+                try {
+                    localStorage.setItem('CATBLACK_DB', JSON.stringify(db));
+                } catch (e) {
+                    console.error('[CatBlack] Erro ao salvar DB:', e);
+                }
             }
         }
 
@@ -961,7 +1034,7 @@
             els.messagesList.innerHTML = sorted.map(function(m, idx) {
                 var realIndex = db.messages.indexOf(m);
                 return (
-                    '<div class="admin-message-item" data-real-index="' + realIndex + '">' +
+                    '<div class="admin-message-item" data-real-index="' + realIndex + '" data-msg-key="' + m.key + '">' +
                     '<div class="msg-header">' +
                     '<span class="msg-key">[' + m.key + ']</span>' +
                     '<span class="msg-date">' + new Date(m.timestamp).toLocaleString('pt-BR') + '</span>' +
@@ -1005,40 +1078,6 @@
         };
 
         // ============================================================
-        // SINCRONIZAÇÃO AUTOMÁTICA DE RESPOSTAS
-        // ============================================================
-        function syncFromStorage() {
-            try {
-                const stored = localStorage.getItem('CATBLACK_DB');
-                if (stored) {
-                    const remoteDB = JSON.parse(stored);
-                    if (remoteDB && remoteDB.messages) {
-                        db = remoteDB;
-                        if (currentViewedKey) {
-                            const msg = db.messages.find(function(m) { return m.key === currentViewedKey; });
-                            if (msg && msg.response !== lastKnownResponse) {
-                                showResponse(msg);
-                            }
-                        }
-                        if (adminVisible) {
-                            renderAdminMessages();
-                        }
-                    }
-                }
-            } catch (e) {
-                console.warn('[CatBlack] Erro ao sincronizar:', e);
-            }
-        }
-
-        window.addEventListener('storage', function(e) {
-            if (e.key === 'CATBLACK_DB') {
-                syncFromStorage();
-            }
-        });
-
-        setInterval(syncFromStorage, 3000);
-
-        // ============================================================
         // LIMPEZA DE MENSAGENS RESPONDIDAS
         // ============================================================
         function clearAnsweredMessages() {
@@ -1049,6 +1088,61 @@
             saveDB();
             renderAdminMessages();
         }
+
+        window.catblackImportByKey = function() {
+            var keyInput = document.getElementById('admin-import-key');
+            var statusEl = document.getElementById('admin-import-status');
+            var key = keyInput.value.trim().toUpperCase();
+            if (!isValidKeyFormat(key)) {
+                statusEl.innerHTML = '<span class="status-err">Formato inválido. Use 8 caracteres alfanuméricos maiúsculos.</span>';
+                return;
+            }
+            var existing = db.messages.find(function(m) { return m.key === key; });
+            if (existing) {
+                statusEl.innerHTML = '<span class="status-ok">Transmissão já presente no painel. Rolando até ela...</span>';
+                var el = document.querySelector('[data-msg-key="' + key + '"]');
+                if (el) {
+                    el.style.borderColor = '#ffffff';
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    setTimeout(function() { el.style.borderColor = '#222222'; }, 1500);
+                }
+                keyInput.value = '';
+                return;
+            }
+            if (firebaseEnabled && messagesRef) {
+                statusEl.textContent = 'Consultando base de dados...';
+                messagesRef.once('value').then(function(snapshot) {
+                    var data = snapshot.val();
+                    var found = null;
+                    if (data) {
+                        Object.values(data).forEach(function(m) {
+                            if (m.key === key) found = m;
+                        });
+                    }
+                    if (found) {
+                        db.messages.push(found);
+                        saveDB();
+                        renderAdminMessages();
+                        statusEl.innerHTML = '<span class="status-ok">Transmissão importada com sucesso.</span>';
+                        keyInput.value = '';
+                        setTimeout(function() {
+                            var el = document.querySelector('[data-msg-key="' + key + '"]');
+                            if (el) {
+                                el.style.borderColor = '#ffffff';
+                                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                setTimeout(function() { el.style.borderColor = '#222222'; }, 1500);
+                            }
+                        }, 200);
+                    } else {
+                        statusEl.innerHTML = '<span class="status-err">Chave não encontrada na base de dados.</span>';
+                    }
+                }).catch(function(err) {
+                    statusEl.innerHTML = '<span class="status-err">Erro na consulta: ' + escapeHtml(err.message) + '</span>';
+                });
+            } else {
+                statusEl.innerHTML = '<span class="status-wait">Modo local ativo. Configure o Firebase para sincronização entre dispositivos.</span>';
+            }
+        };
 
         window.catblackClearAnswered = clearAnsweredMessages;
 
@@ -1068,7 +1162,7 @@
         // ============================================================
         // INICIALIZAÇÃO DA APLICAÇÃO
         // ============================================================
-        initDB();
+        initFirebase();
         updateCurrentDate();
         setTimeout(initSequence, 600);
         setInterval(updateCurrentDate, 60000);
