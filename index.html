@@ -536,18 +536,34 @@
         // 4. Substitua os valores placeholder abaixo pelos seus reais.
         // ============================================================
         const FIREBASE_CONFIG = {
-            apiKey: "SUA_API_KEY",
-            authDomain: "SEU_PROJETO.firebaseapp.com",
-            databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
-            projectId: "SEU_PROJETO",
-            storageBucket: "SEU_PROJETO.appspot.com",
-            messagingSenderId: "000000000000",
-            appId: "1:000000000000:web:0000000000000000000000"
+            apiKey: "AIzaSyBHMKf3xYoc8IkEZ2gR9kUnuBLcS7HhnFw",
+            authDomain: "catblacky-7a0e0.firebaseapp.com",
+            databaseURL: "https://catblacky-7a0e0-default-rtdb.firebaseio.com",
+            projectId: "catblacky-7a0e0",
+            storageBucket: "catblacky-7a0e0.firebasestorage.app",
+            messagingSenderId: "900561924963",
+            appId: "1:900561924963:web:22bc6adf6414e3be2d1956"
         };
 
-        let firebaseApp = null;
-        let messagesRef = null;
-        let firebaseEnabled = false;
+let firebaseApp = null;
+let messagesRef = null;
+let firebaseEnabled = false;
+
+// Inicialização segura do Firebase para ambiente de script único (compat)
+try {
+    if (typeof firebase !== 'undefined') {
+        firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
+        // Aponta para o nó de mensagens dentro do seu Realtime Database
+        messagesRef = firebase.database().ref('messages');
+        firebaseEnabled = true;
+        console.log("Firebase sincronizado com sucesso.");
+    } else {
+        console.warn("SDK do Firebase não foi detectado. Rodando no modo localStorage local.");
+    }
+} catch (error) {
+    console.error("Erro ao inicializar o Firebase:", error);
+    firebaseEnabled = false;
+}
 
         // ============================================================
         // ESTADO GLOBAL
