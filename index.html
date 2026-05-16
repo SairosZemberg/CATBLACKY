@@ -409,6 +409,7 @@
             background: #555555;
         }
     </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -461,7 +462,10 @@
     </div>
 
     <div id="admin-panel">
-        <div class="admin-header">Painel do Host // Acesso Restrito</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; margin-bottom:25px; border-bottom:1px solid #333333; padding-bottom:10px;">
+            <div class="admin-header" style="border:none; padding:0; margin:0;">Painel do Host // Acesso Restrito</div>
+            <button onclick="window.catblackClearAnswered()" style="margin:0;" title="Apagar todas as mensagens já respondidas">Limpar Respondidas</button>
+        </div>
         <div id="messages-list"></div>
         <div class="admin-hint">Pressione Ctrl+Shift+A para ocultar este painel.</div>
     </div>
@@ -522,6 +526,8 @@
         let inactivityTimer2 = null;
         let isIdle = false;
         let adminVisible = false;
+        let currentViewedKey = null;
+        let lastKnownResponse = null;
 
         // ============================================================
         // REFERÊNCIAS DOM
@@ -821,6 +827,8 @@
                 showResponse(existing);
                 els.input.value = '';
             } else {
+                currentViewedKey = null;
+                lastKnownResponse = null;
                 els.response.innerHTML =
                     '<div class="response-box">' +
                     '<p><span class="status-err">> CHAVE NÃO RECONHECIDA.</span></p>' +
@@ -853,9 +861,13 @@
                 '</div>';
             els.confirmation.style.display = 'block';
             els.response.style.display = 'none';
+            currentViewedKey = key;
+            lastKnownResponse = null;
         }
 
         function showResponse(data) {
+            currentViewedKey = data.key;
+            lastKnownResponse = data.response;
             var html =
                 '<div class="response-box">' +
                 '<p>> Chave <span class="key-highlight">' + data.key + '</span> reconhecida no sistema.</p>';
@@ -991,6 +1003,54 @@
                 }, 800);
             }
         };
+
+        // ============================================================
+        // SINCRONIZAÇÃO AUTOMÁTICA DE RESPOSTAS
+        // ============================================================
+        function syncFromStorage() {
+            try {
+                const stored = localStorage.getItem('CATBLACK_DB');
+                if (stored) {
+                    const remoteDB = JSON.parse(stored);
+                    if (remoteDB && remoteDB.messages) {
+                        db = remoteDB;
+                        if (currentViewedKey) {
+                            const msg = db.messages.find(function(m) { return m.key === currentViewedKey; });
+                            if (msg && msg.response !== lastKnownResponse) {
+                                showResponse(msg);
+                            }
+                        }
+                        if (adminVisible) {
+                            renderAdminMessages();
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('[CatBlack] Erro ao sincronizar:', e);
+            }
+        }
+
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'CATBLACK_DB') {
+                syncFromStorage();
+            }
+        });
+
+        setInterval(syncFromStorage, 3000);
+
+        // ============================================================
+        // LIMPEZA DE MENSAGENS RESPONDIDAS
+        // ============================================================
+        function clearAnsweredMessages() {
+            if (!confirm('Tem certeza de que deseja apagar todas as mensagens respondidas? Esta ação não pode ser desfeita.')) {
+                return;
+            }
+            db.messages = db.messages.filter(function(m) { return !m.answered; });
+            saveDB();
+            renderAdminMessages();
+        }
+
+        window.catblackClearAnswered = clearAnsweredMessages;
 
         // ============================================================
         // EVENT LISTENERS DOS BOTÕES PRINCIPAIS
