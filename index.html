@@ -408,13 +408,178 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #555555;
         }
+
+        /* ===== EASTER EGG / INATIVIDADE PROFUNDA ===== */
+        .border-glow {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 900;
+            border: 2px solid transparent;
+            transition: border-color 3s ease-in-out, box-shadow 3s ease-in-out;
+        }
+
+        .border-glow.active {
+            border-color: rgba(255, 200, 0, 0.35);
+            box-shadow: inset 0 0 80px rgba(255, 170, 0, 0.12),
+                        0 0 40px rgba(255, 180, 0, 0.08);
+            background: radial-gradient(ellipse at center, rgba(255, 160, 0, 0.03) 0%, transparent 70%);
+            transition: border-color 4s ease-in-out, box-shadow 4s ease-in-out, background 4s ease-in-out;
+        }
+
+        .border-glow.flicker {
+            animation: borderFlicker 2s infinite alternate;
+            border-color: rgba(255, 180, 0, 0.6);
+            box-shadow: inset 0 0 80px rgba(255, 150, 0, 0.25),
+                        0 0 40px rgba(255, 180, 0, 0.2);
+        }
+
+        @keyframes borderFlicker {
+            0%   { border-color: rgba(255,180,0,0.5); box-shadow: inset 0 0 60px rgba(255,150,0,0.2), 0 0 30px rgba(255,180,0,0.15); }
+            25%  { border-color: rgba(255,200,0,0.7); box-shadow: inset 0 0 90px rgba(255,170,0,0.35), 0 0 50px rgba(255,200,0,0.3); }
+            50%  { border-color: rgba(255,160,0,0.4); box-shadow: inset 0 0 50px rgba(255,140,0,0.15), 0 0 20px rgba(255,160,0,0.1); }
+            75%  { border-color: rgba(255,220,0,0.8); box-shadow: inset 0 0 100px rgba(255,190,0,0.4), 0 0 60px rgba(255,220,0,0.35); }
+            100% { border-color: rgba(255,180,0,0.6); box-shadow: inset 0 0 70px rgba(255,160,0,0.25), 0 0 40px rgba(255,180,0,0.2); }
+        }
+
+        #easter-egg-container {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 950;
+            text-align: center;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+            width: 90%;
+            max-width: 700px;
+        }
+
+        #easter-egg-container.visible {
+            opacity: 1;
+            pointer-events: none;
+        }
+
+        .egg-text, .egg-ascii {
+            pointer-events: all;
+            cursor: pointer;
+        }
+
+        .egg-text {
+            font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
+            font-size: 1.4rem;
+            color: #cccccc;
+            cursor: pointer;
+            line-height: 1.6;
+            transition: opacity 0.8s ease-in-out, color 0.8s ease-in-out;
+            display: inline-block;
+        }
+
+        .egg-text.yellow {
+            color: #ffcc00;
+            text-shadow: 0 0 10px rgba(255, 200, 0, 0.4);
+        }
+
+        .egg-ascii {
+            font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
+            font-size: 1.2rem;
+            color: #ffcc00;
+            cursor: pointer;
+            line-height: 1.4;
+            white-space: pre;
+            text-shadow: 0 0 15px rgba(255, 200, 0, 0.5);
+            transition: opacity 0.8s ease-in-out;
+            display: inline-block;
+        }
+
+        /* ===== DESTRUIÇÃO / QUEIMADURA ===== */
+        .burn-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 2000;
+            background: #000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+
+        .burn-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+            background: #1a1200;
+            animation: burnSpread 4s ease-in-out forwards;
+        }
+
+        @keyframes burnSpread {
+            0%   { background: #000000; }
+            30%  { background: #2a1a00; }
+            60%  { background: #3d2600; }
+            100% { background: #4a2e00; }
+        }
+
+        .fly-away {
+            animation: flyAway 2.5s ease-in forwards;
+        }
+
+        @keyframes flyAway {
+            0%   { opacity: 1; transform: translateY(0) rotate(0deg); }
+            30%  { opacity: 0.8; transform: translateY(-20px) rotate(2deg) translateX(5px); }
+            60%  { opacity: 0.4; transform: translateY(-60px) rotate(-5deg) translateX(-10px); }
+            100% { opacity: 0; transform: translateY(-150px) rotate(10deg) translateX(20px); }
+        }
+
+        .burn-text {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2001;
+            font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
+            font-size: 1.8rem;
+            color: #000000;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            pointer-events: none;
+            width: 90%;
+            max-width: 600px;
+            font-weight: bold;
+        }
+
+        .burn-text.visible {
+            opacity: 1;
+        }
+
+        .burn-text.fade-out-slow {
+            opacity: 0;
+            transition: opacity 3s ease-in-out;
+        }
+
+        .flicker-bg {
+            animation: bgFlicker 0.15s infinite alternate;
+        }
+
+        @keyframes bgFlicker {
+            0%   { background-color: #4a2e00; }
+            100% { background-color: #5c3a00; }
+        }
     </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
+
+    <div id="border-glow" class="border-glow"></div>
+
+    <div id="easter-egg-container">
+        <div id="egg-content"></div>
+    </div>
+
+    <div id="burn-overlay" class="burn-overlay"></div>
+    <div id="burn-text" class="burn-text"></div>
+
 
     <div id="idle-text-1" class="idle-message">Por que você está aqui?</div>
     <div id="idle-text-2" class="idle-message">Gostaria de perguntar algo?</div>
@@ -588,6 +753,7 @@ try {
         let adminVisible = false;
         let currentViewedKey = null;
         let lastKnownResponse = null;
+        let eggLocked = false;
 
         // ============================================================
         // REFERÊNCIAS DOM
@@ -800,6 +966,7 @@ try {
 
             typingComplete = true;
             startInactivityMonitor();
+            startEggTimers();
         }
 
         // ============================================================
@@ -1101,8 +1268,242 @@ try {
         });
 
         // ============================================================
+        // EASTER EGG — INATIVIDADE PROFUNDA
+        // ============================================================
+        const EGG_CONFIG = {
+            glowDelay: 300000,
+            deepIdleDelay: 360000,
+            cooldown: 3600000,
+            texts: [
+                "Não há paz a quem procura bagunça",
+                "você realmente está aqui por vontade própria?",
+                "Sua dedicação é solene, entretanto, pare de clicar em coisas aleatórias"
+            ],
+            crownAscii: "    👑\n  ╱───╲\n ╱     ╲\n│  ♦♦♦  │\n ╲     ╱\n  ╲───╱"
+        };
+
+        let eggState = 0;
+        let eggActive = false;
+        let deepIdleActive = false;
+        let glowTimer = null;
+        let deepIdleTimer = null;
+        let eggCooldownUntil = 0;
+
+        const elsEgg = {
+            borderGlow: document.getElementById("border-glow"),
+            eggContainer: document.getElementById("easter-egg-container"),
+            eggContent: document.getElementById("egg-content"),
+            burnOverlay: document.getElementById("burn-overlay"),
+            burnText: document.getElementById("burn-text")
+        };
+
+        function loadCooldown() {
+            try {
+                var ts = localStorage.getItem("CATBLACK_EGG_COOLDOWN");
+                if (ts) eggCooldownUntil = parseInt(ts, 10);
+            } catch (e) {}
+        }
+
+        function saveCooldown() {
+            try {
+                localStorage.setItem("CATBLACK_EGG_COOLDOWN", String(Date.now() + EGG_CONFIG.cooldown));
+            } catch (e) {}
+        }
+
+        function isCooldownActive() {
+            return Date.now() < eggCooldownUntil;
+        }
+
+        function startEggTimers() {
+            if (isCooldownActive() || eggActive) return;
+            clearTimeout(glowTimer);
+            clearTimeout(deepIdleTimer);
+            glowTimer = setTimeout(activateGlow, EGG_CONFIG.glowDelay);
+            deepIdleTimer = setTimeout(activateDeepIdle, EGG_CONFIG.deepIdleDelay);
+        }
+
+        function stopEggTimers() {
+            clearTimeout(glowTimer);
+            clearTimeout(deepIdleTimer);
+        }
+
+        function activateGlow() {
+            if (!isIdle || isCooldownActive() || eggLocked) return;
+            elsEgg.borderGlow.classList.add("active");
+            // Suavemente remove o texto de inatividade 2 quando as bordas surgem
+            if (els.idle2 && els.idle2.classList.contains('visible')) {
+                els.idle2.style.transition = 'opacity 2.5s ease-in-out';
+                els.idle2.style.opacity = '0';
+                setTimeout(function() {
+                    els.idle2.classList.remove('visible');
+                    els.idle2.style.opacity = '';
+                    els.idle2.style.transition = '';
+                }, 2500);
+            }
+        }
+
+        function activateDeepIdle() {
+            if (!isIdle || isCooldownActive() || eggLocked) return;
+            deepIdleActive = true;
+            eggLocked = true;
+            elsEgg.borderGlow.classList.remove("active");
+            elsEgg.borderGlow.classList.add("flicker");
+
+            if (els.catArt) {
+                els.catArt.style.transition = "opacity 3s ease-in-out";
+                els.catArt.style.opacity = "0";
+            }
+
+            // Garante que o texto de inatividade está totalmente oculto
+            if (els.idle2) {
+                els.idle2.classList.remove('visible');
+                els.idle2.style.opacity = '';
+                els.idle2.style.transition = '';
+            }
+            if (els.idle1) {
+                els.idle1.classList.remove('visible');
+            }
+
+            eggState = 0;
+            showEggText(EGG_CONFIG.texts[0], false);
+            elsEgg.eggContainer.classList.add("visible");
+            eggActive = true;
+        }
+
+        function showEggText(text, isYellow) {
+            elsEgg.eggContent.innerHTML = '<div class="egg-text ' + (isYellow ? "yellow" : "") + '">' + escapeHtml(text) + "</div>";
+            var el = elsEgg.eggContent.querySelector(".egg-text");
+            if (el) {
+                el.style.opacity = "0";
+                requestAnimationFrame(function() {
+                    el.style.opacity = "1";
+                });
+                el.addEventListener("click", handleEggClick);
+            }
+        }
+
+        function showEggCrown() {
+            elsEgg.eggContent.innerHTML = '<div class="egg-ascii">' + EGG_CONFIG.crownAscii.replace(/\n/g, "<br>") + "</div>";
+            var el = elsEgg.eggContent.querySelector(".egg-ascii");
+            if (el) {
+                el.style.opacity = "0";
+                requestAnimationFrame(function() {
+                    el.style.opacity = "1";
+                });
+                el.addEventListener("click", triggerDestruction);
+            }
+        }
+
+        function handleEggClick() {
+            var current = elsEgg.eggContent.querySelector(".egg-text");
+            if (current) {
+                current.style.opacity = "0";
+            }
+            setTimeout(function() {
+                eggState++;
+                if (eggState === 1) {
+                    showEggText(EGG_CONFIG.texts[1], false);
+                } else if (eggState === 2) {
+                    showEggText(EGG_CONFIG.texts[2], true);
+                } else if (eggState === 3) {
+                    showEggCrown();
+                }
+            }, 800);
+        }
+
+        function triggerDestruction() {
+            saveCooldown();
+            eggActive = false;
+            deepIdleActive = false;
+            elsEgg.eggContainer.classList.remove("visible");
+            elsEgg.burnOverlay.classList.add("active");
+            document.body.classList.add("flicker-bg");
+
+            // Deixa o conteúdo principal meio opaco para destacar o texto preto
+            els.mainWrapper.style.transition = "opacity 2s ease-in-out";
+            els.mainWrapper.style.opacity = "0.25";
+
+            // As letras voam e somem aos poucos
+            var allContent = document.querySelectorAll("#main-wrapper > *");
+            allContent.forEach(function(el, i) {
+                setTimeout(function() {
+                    el.classList.add("fly-away");
+                }, i * 250);
+            });
+
+            // Texto 1: "Ao longo da orla"
+            setTimeout(function() {
+                elsEgg.burnText.textContent = "Ao longo da orla";
+                elsEgg.burnText.classList.add("visible");
+            }, 2000);
+
+            // Após 2s: muda suavemente para "irrompe a turva torrente"
+            setTimeout(function() {
+                elsEgg.burnText.style.transition = "opacity 1.5s ease-in-out";
+                elsEgg.burnText.style.opacity = "0";
+                setTimeout(function() {
+                    elsEgg.burnText.textContent = "irrompe a turva torrente";
+                    elsEgg.burnText.style.opacity = "1";
+                }, 1500);
+            }, 4000);
+
+            // Após 2s: some suavemente
+            setTimeout(function() {
+                elsEgg.burnText.style.opacity = "0";
+            }, 6000);
+
+            // Restaura o site após a sequência completa
+            setTimeout(function() {
+                restoreSite();
+            }, 10000);
+        }
+
+        function restoreSite() {
+            document.body.classList.remove("flicker-bg");
+            elsEgg.burnOverlay.classList.remove("active");
+            elsEgg.borderGlow.classList.remove("flicker", "active");
+            elsEgg.burnText.classList.remove("visible", "fade-out-slow");
+            elsEgg.burnText.style.opacity = "";
+            elsEgg.burnText.textContent = "";
+
+            var allContent = document.querySelectorAll("#main-wrapper > *");
+            allContent.forEach(function(el) {
+                el.classList.remove("fly-away");
+                el.style.opacity = "";
+                el.style.transform = "";
+            });
+
+            if (els.catArt) {
+                els.catArt.style.opacity = "1";
+                els.catArt.style.transition = "";
+            }
+
+            isIdle = false;
+            els.mainWrapper.classList.remove("faded");
+            els.idle1.classList.remove("visible");
+            els.idle2.classList.remove("visible");
+            resetInactivity();
+        }
+
+        var originalResetInactivity = resetInactivity;
+        resetInactivity = function() {
+            originalResetInactivity();
+            if (deepIdleActive && !eggActive) {
+                // Após 6 min (deep idle), atividade não cancela o Easter Egg
+                // Mantém as bordas em luz sintilante e o egg container visível
+                // Apenas reinicia os timers de monitoramento
+                stopEggTimers();
+                startEggTimers();
+                return;
+            }
+            stopEggTimers();
+            startEggTimers();
+        };
+
+        // ============================================================
         // INICIALIZAÇÃO DA APLICAÇÃO
         // ============================================================
+        loadCooldown();
         if (!firebaseEnabled) initDB();
         updateCurrentDate();
         setTimeout(initSequence, 600);
