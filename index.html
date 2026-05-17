@@ -209,12 +209,13 @@
             color: #ff4444;
         }
 
+        /* ===== MENSAGENS DE INATIVIDADE — VERMELHO CINTILANTE ===== */
         .idle-message {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            color: #cccccc;
+            color: #ff1a1a;
             font-size: 1.6rem;
             text-align: center;
             opacity: 0;
@@ -224,6 +225,11 @@
             width: 90%;
             max-width: 600px;
             letter-spacing: 1px;
+            text-shadow:
+                0 0 10px rgba(255, 30, 30, 0.9),
+                0 0 30px rgba(255, 20, 20, 0.6),
+                0 0 60px rgba(255, 0, 0, 0.3);
+            filter: drop-shadow(0 0 25px rgba(180, 0, 0, 0.5));
         }
 
         @media (max-width: 600px) {
@@ -352,6 +358,91 @@
             line-height: 1.5;
         }
 
+        /* ===== ADMIN — MÚLTIPLAS RESPOSTAS E ANEXOS ===== */
+        .responses-history {
+            margin-bottom: 15px;
+        }
+
+        .response-item {
+            border: 1px solid #2a2a2a;
+            padding: 12px;
+            margin-bottom: 10px;
+            background-color: #080808;
+        }
+
+        .response-header {
+            color: #888888;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #1a1a1a;
+            padding-bottom: 4px;
+        }
+
+        .response-body {
+            color: #dddddd;
+            margin-bottom: 8px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .response-puzzle {
+            color: #999999;
+            border: 1px dashed #333333;
+            padding: 8px;
+            margin-top: 8px;
+            font-size: 12px;
+            word-wrap: break-word;
+        }
+
+        .attachments-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .attachment-thumb {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border: 1px solid #333333;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .attachment-thumb:hover {
+            border-color: #ffffff;
+        }
+
+        .draft-area {
+            position: relative;
+            border: 1px solid #1a1a1a;
+            padding: 15px;
+            background-color: #0a0a0a;
+        }
+
+        .draft-area.collapsed .draft-fields {
+            display: none;
+        }
+
+        .draft-warning {
+            position: absolute;
+            bottom: 10px;
+            left: 15px;
+            color: #ffcc00;
+            font-size: 11px;
+            cursor: pointer;
+            transition: color 0.3s;
+            letter-spacing: 0.5px;
+        }
+
+        .draft-warning:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
         .admin-reply-form label {
             display: block;
             color: #888888;
@@ -380,6 +471,97 @@
 
         .admin-reply-form button {
             margin-top: 5px;
+        }
+
+        .more-btn {
+            display: inline-block;
+            color: #666666;
+            font-size: 12px;
+            cursor: pointer;
+            margin: 5px 0 10px;
+            transition: color 0.3s;
+            user-select: none;
+        }
+
+        .more-btn:hover {
+            color: #aaaaaa;
+        }
+
+        .expandable-area {
+            display: none;
+            margin-bottom: 10px;
+        }
+
+        .expandable-area.open {
+            display: block;
+        }
+
+        .file-input-wrap {
+            margin-bottom: 10px;
+        }
+
+        .file-input-wrap input[type="file"] {
+            color: #aaaaaa;
+            font-size: 12px;
+            font-family: 'Courier New', 'Consolas', monospace;
+        }
+
+        .file-input-wrap input[type="file"]::-webkit-file-upload-button {
+            background: #111111;
+            border: 1px solid #444444;
+            color: #aaaaaa;
+            font-family: 'Courier New', 'Consolas', monospace;
+            font-size: 11px;
+            padding: 6px 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .file-input-wrap input[type="file"]::-webkit-file-upload-button:hover {
+            border-color: #ffffff;
+            color: #ffffff;
+        }
+
+        .preview-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .preview-item {
+            position: relative;
+            width: 70px;
+            height: 70px;
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border: 1px solid #333333;
+        }
+
+        .preview-item .remove-btn {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 18px;
+            height: 18px;
+            background: #ff4444;
+            color: #ffffff;
+            border: none;
+            font-size: 11px;
+            line-height: 18px;
+            text-align: center;
+            cursor: pointer;
+            padding: 0;
+            font-family: sans-serif;
+        }
+
+        .preview-item .remove-btn:hover {
+            background: #ff6666;
         }
 
         .admin-hint {
@@ -468,11 +650,19 @@
         .egg-text {
             font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
             font-size: 1.4rem;
-            color: #cccccc;
+            color: #ff1a1a;
             cursor: pointer;
             line-height: 1.6;
-            transition: opacity 0.8s ease-in-out, color 0.8s ease-in-out;
+            transition: opacity 0.8s ease-in-out, color 2.5s ease-in-out;
             display: inline-block;
+            text-shadow:
+                0 0 10px rgba(255, 30, 30, 0.8),
+                0 0 30px rgba(255, 20, 20, 0.4);
+        }
+
+        .egg-text.settled {
+            color: #cccccc;
+            text-shadow: none;
         }
 
         .egg-text.yellow {
@@ -568,6 +758,7 @@
 <base target="_blank">
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -602,7 +793,7 @@
 ⠀⠀⠀⠀⠙⠿⣿⣿⣿⣿⣿⣿⣿⡿⠿⠛⠋⠉⠁⠀⠀⠀⠀⠈⠛⠃⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠉⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ┎┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┒
-    Login n°8-20-20-16-19://4-9-19-3-15-18-4-4-7-7/10-11-20-26-20-6-4-26-6  
+    Login n°8-20-20-16-19://4-9-19-3-15-14-4-4-7-7/10-11-20-26-20-6-4-26-6  
 ┖┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┚</pre>
 
         <pre id="cat-art" class="ascii-art"></pre>
@@ -662,36 +853,12 @@
             typingSpeedWelcome: 35,
             keyLength: 8,
             maxInputLength: 500,
-            // =========================================================
-            // CONFIGURAÇÃO DE ENVIO REAL DE E-MAIL
-            // =========================================================
-            // Opção 1 — Formspree (recomendado, sem backend):
-            // 1. Acesse https://formspree.io e crie uma conta gratuita.
-            // 2. Crie um novo formulário e defina o e-mail de destino
-            //    como: antonny135121215@proton.me
-            // 3. Copie o endpoint (ex: https://formspree.io/f/xnqkvnzy)
-            //    e cole abaixo na variável formspreeEndpoint.
-            // 4. Suba este HTML em qualquer hospedagem estática (GitHub Pages,
-            //    Netlify, Vercel, etc.) e o envio funcionará imediatamente.
-            // =========================================================
             formspreeEndpoint: 'https://formspree.io/f/meedjazp',
-            // =========================================================
-            // Opção 2 — Backend próprio (controle total):
-            // Se preferir não depender de terceiros, use o arquivo
-            // server.js fornecido junto. Configure-o em um VPS ou
-            // plataforma como Render/Railway, aponte o domínio abaixo
-            // e descomente a linha do fetch no backendSend().
-            // =========================================================
             backendUrl: ''
         };
 
         // ============================================================
-        // CONFIGURAÇÃO FIREBASE (sincronização entre dispositivos)
-        // ============================================================
-        // 1. Acesse https://console.firebase.google.com e crie um projeto.
-        // 2. Ative o Realtime Database (modo teste / público para iniciar).
-        // 3. Copie as credenciais abaixo (Configuração do SDK > CDN).
-        // 4. Substitua os valores placeholder abaixo pelos seus reais.
+        // CONFIGURAÇÃO FIREBASE
         // ============================================================
         const FIREBASE_CONFIG = {
             apiKey: "AIzaSyBHMKf3xYoc8IkEZ2gR9kUnuBLcS7HhnFw",
@@ -703,36 +870,46 @@
             appId: "1:900561924963:web:22bc6adf6414e3be2d1956"
         };
 
-let firebaseApp = null;
-let messagesRef = null;
-let firebaseEnabled = false;
+        let firebaseApp = null;
+        let messagesRef = null;
+        let firebaseEnabled = false;
 
-// Inicialização segura do Firebase para ambiente de script único (compat)
-try {
-    if (typeof firebase !== 'undefined') {
-        firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
-        // Aponta para o nó de mensagens dentro do seu Realtime Database
-        messagesRef = firebase.database().ref('messages');
-        firebaseEnabled = true;
-        console.log("Firebase sincronizado com sucesso.");
-    } else {
-        console.warn("SDK do Firebase não foi detectado. Rodando no modo localStorage local.");
-    }
-} catch (error) {
-    console.error("Erro ao inicializar o Firebase:", error);
-    firebaseEnabled = false;
-}
+        try {
+            if (typeof firebase !== 'undefined') {
+                firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
+                messagesRef = firebase.database().ref('messages');
+                firebaseEnabled = true;
+                console.log("Firebase sincronizado com sucesso.");
+            } else {
+                console.warn("SDK do Firebase não foi detectado. Rodando no modo localStorage local.");
+            }
+        } catch (error) {
+            console.error("Erro ao inicializar o Firebase:", error);
+            firebaseEnabled = false;
+        }
 
-        // Listener em tempo real para sincronização automática
         if (firebaseEnabled && messagesRef) {
             messagesRef.on('value', function(snapshot) {
                 var data = snapshot.val();
                 db.messages = data ? Object.values(data) : [];
+                // Migração: garante que todas as mensagens tenham o campo responses (array)
+                db.messages.forEach(function(m) {
+                    if (!Array.isArray(m.responses)) {
+                        m.responses = [];
+                        if (m.response) {
+                            m.responses.push({
+                                text: m.response,
+                                puzzle: m.nextPuzzle || null,
+                                attachments: [],
+                                timestamp: m.timestamp
+                            });
+                            m.answered = true;
+                        }
+                    }
+                });
                 if (currentViewedKey) {
                     var msg = db.messages.find(function(m) { return m.key === currentViewedKey; });
-                    if (msg && msg.response !== lastKnownResponse) {
-                        showResponse(msg);
-                    }
+                    if (msg) showResponse(msg);
                 }
                 if (adminVisible) renderAdminMessages();
             });
@@ -754,6 +931,9 @@ try {
         let currentViewedKey = null;
         let lastKnownResponse = null;
         let eggLocked = false;
+
+        // Rascunhos de anexos em memória (index -> array de dataURLs)
+        let draftAttachments = {};
 
         // ============================================================
         // REFERÊNCIAS DOM
@@ -779,7 +959,7 @@ try {
         };
 
         // ============================================================
-        // BANCO DE DADOS — Firebase (nuvem) com fallback local
+        // BANCO DE DADOS
         // ============================================================
         function initDB() {
             try {
@@ -787,6 +967,21 @@ try {
                 if (stored) {
                     db = JSON.parse(stored);
                     if (!db.messages) db.messages = [];
+                    // Migração de dados antigos para novo formato
+                    db.messages.forEach(function(m) {
+                        if (!Array.isArray(m.responses)) {
+                            m.responses = [];
+                            if (m.response) {
+                                m.responses.push({
+                                    text: m.response,
+                                    puzzle: m.nextPuzzle || null,
+                                    attachments: m.attachments || [],
+                                    timestamp: m.timestamp
+                                });
+                                m.answered = true;
+                            }
+                        }
+                    });
                 }
             } catch (e) {
                 console.warn('[CatBlack] Erro ao carregar DB local:', e);
@@ -849,7 +1044,6 @@ try {
                 _subject: 'CatBlack :: Transmissão [' + data.key + ']'
             };
 
-            // Montar corpo legível para o administrador
             const emailBody =
                 '=== TRANSMISSÃO CATBLACK ===' + '\n' +
                 'Chave: ' + data.key + '\n' +
@@ -860,14 +1054,12 @@ try {
                 '===========================' + '\n' +
                 'Responda pelo painel admin do site usando a chave acima.';
 
-            // --- OPÇÃO 1: Formspree (sem backend próprio) ---
             if (CONFIG.formspreeEndpoint && CONFIG.formspreeEndpoint.indexOf('SEU_ENDPOINT') === -1) {
                 try {
                     const formData = new FormData();
                     formData.append('email', CONFIG.adminEmail);
                     formData.append('subject', payload._subject);
                     formData.append('message', emailBody);
-                    // Campo oculto anti-spam do Formspree
                     formData.append('_gotcha', '');
 
                     const res = await fetch(CONFIG.formspreeEndpoint, {
@@ -887,7 +1079,6 @@ try {
                 }
             }
 
-            // --- OPÇÃO 2: Backend próprio ---
             if (CONFIG.backendUrl) {
                 try {
                     const res = await fetch(CONFIG.backendUrl + '/api/transmit', {
@@ -909,7 +1100,6 @@ try {
                 }
             }
 
-            // --- Fallback: apenas log no console (modo local) ---
             console.log('%c[CatBlack] MODO LOCAL — E-mail NÃO enviado.', 'color: #ffaa44; font-weight: bold;');
             console.log('Destino:', CONFIG.adminEmail);
             console.log('Chave:', data.key);
@@ -1027,15 +1217,13 @@ try {
                 key: key,
                 message: text,
                 timestamp: new Date().toISOString(),
-                response: null,
-                nextPuzzle: null,
+                responses: [],
                 answered: false
             };
 
             db.messages.push(messageData);
             saveDB();
 
-            // Enviar e-mail real para o administrador
             var sendResult = await backendSend(messageData);
 
             showConfirmation(key, text, sendResult);
@@ -1103,25 +1291,33 @@ try {
 
         function showResponse(data) {
             currentViewedKey = data.key;
-            lastKnownResponse = data.response;
             var html =
                 '<div class="response-box">' +
                 '<p>> Chave <span class="key-highlight">' + data.key + '</span> reconhecida no sistema.</p>';
 
-            if (!data.response) {
+            if (!data.responses || data.responses.length === 0) {
                 html +=
                     '<p><span class="status-wait">> Status: Aguardando resposta do Host.</span></p>' +
                     '<p>> Nenhuma transmissão de retorno foi vinculada a esta chave até o momento.</p>' +
                     '<p>> Retorne posteriormente.</p>';
             } else {
-                html +=
-                    '<p><span class="status-ok">> Transmissão recebida do Host:</span></p>' +
-                    '<p class="response-text">"' + escapeHtml(data.response) + '"</p>';
-                if (data.nextPuzzle) {
+                data.responses.forEach(function(resp, idx) {
                     html +=
-                        '<p>> Próximo desdobramento vinculado:</p>' +
-                        '<p class="puzzle-text">' + escapeHtml(data.nextPuzzle) + '</p>';
-                }
+                        '<p><span class="status-ok">> Transmissão #' + (idx + 1) + ' recebida do Host:</span></p>' +
+                        '<p class="response-text">"' + escapeHtml(resp.text) + '"</p>';
+                    if (resp.puzzle) {
+                        html +=
+                            '<p>> Próximo desdobramento vinculado:</p>' +
+                            '<p class="puzzle-text">' + escapeHtml(resp.puzzle) + '</p>';
+                    }
+                    if (resp.attachments && resp.attachments.length > 0) {
+                        html += '<div style="display:flex; flex-wrap:wrap; gap:8px; margin:10px 0;">';
+                        resp.attachments.forEach(function(att) {
+                            html += '<img src="' + att + '" style="width:120px; height:120px; object-fit:cover; border:1px solid #444;">';
+                        });
+                        html += '</div>';
+                    }
+                });
                 html += '<p>> Fim da transmissão.</p>';
             }
 
@@ -1158,7 +1354,7 @@ try {
         });
 
         // ============================================================
-        // PAINEL ADMINISTRATIVO OCULTO
+        // PAINEL ADMINISTRATIVO — MÚLTIPLAS RESPOSTAS E ANEXOS
         // ============================================================
         function toggleAdminPanel() {
             adminVisible = !adminVisible;
@@ -1196,37 +1392,166 @@ try {
 
             els.messagesList.innerHTML = sorted.map(function(m, idx) {
                 var realIndex = db.messages.indexOf(m);
+                var hasResponses = m.responses && m.responses.length > 0;
+                var isCollapsed = hasResponses;
+
+                var historyHtml = '';
+                if (hasResponses) {
+                    historyHtml = '<div class="responses-history">' +
+                        m.responses.map(function(r, ri) {
+                            var attHtml = '';
+                            if (r.attachments && r.attachments.length > 0) {
+                                attHtml = '<div class="attachments-grid">' +
+                                    r.attachments.map(function(att) {
+                                        return '<img src="' + att + '" class="attachment-thumb" onclick="window.open(this.src)">';
+                                    }).join('') +
+                                    '</div>';
+                            }
+                            return '<div class="response-item">' +
+                                '<div class="response-header">Resposta #' + (ri + 1) + ' — ' + new Date(r.timestamp).toLocaleString('pt-BR') + '</div>' +
+                                '<div class="response-body">' + escapeHtml(r.text) + '</div>' +
+                                (r.puzzle ? '<div class="response-puzzle">' + escapeHtml(r.puzzle) + '</div>' : '') +
+                                attHtml +
+                                '</div>';
+                        }).join('') +
+                        '</div>';
+                }
+
+                var draftId = 'draft-' + realIndex;
+                var draftClass = isCollapsed ? 'draft-area collapsed' : 'draft-area';
+                var warningHtml = isCollapsed ?
+                    '<span class="draft-warning" onclick="window.catblackStartDraft(' + realIndex + ')">Escrever mais uma resposta</span>' : '';
+
+                var previewHtml = '';
+                var currentAtts = draftAttachments[realIndex] || [];
+                if (currentAtts.length > 0) {
+                    previewHtml = '<div class="preview-area" id="preview-' + realIndex + '">' +
+                        currentAtts.map(function(att, ai) {
+                            return '<div class="preview-item">' +
+                                '<img src="' + att + '">' +
+                                '<button class="remove-btn" onclick="window.catblackRemoveAttachment(' + realIndex + ',' + ai + ')">&times;</button>' +
+                                '</div>';
+                        }).join('') +
+                        '</div>';
+                }
+
                 return (
                     '<div class="admin-message-item" data-real-index="' + realIndex + '" data-msg-key="' + m.key + '">' +
                     '<div class="msg-header">' +
                     '<span class="msg-key">[' + m.key + ']</span>' +
                     '<span class="msg-date">' + new Date(m.timestamp).toLocaleString('pt-BR') + '</span>' +
-                    '<span class="msg-status ' + (m.answered ? 'answered' : '') + '">' + (m.answered ? 'RESPONDIDO' : 'PENDENTE') + '</span>' +
+                    '<span class="msg-status ' + (hasResponses ? 'answered' : '') + '">' + (hasResponses ? 'RESPONDIDO (' + m.responses.length + ')' : 'PENDENTE') + '</span>' +
                     '</div>' +
                     '<div class="msg-content">' + escapeHtml(m.message) + '</div>' +
+                    historyHtml +
+                    '<div class="' + draftClass + '" id="' + draftId + '">' +
+                    '<div class="draft-fields">' +
                     '<div class="admin-reply-form">' +
                     '<label>Resposta do Host para o remetente:</label>' +
-                    '<textarea id="resp-' + realIndex + '" rows="3" placeholder="Digite a resposta...">' + escapeHtml(m.response || '') + '</textarea>' +
+                    '<textarea id="resp-' + realIndex + '" rows="3" placeholder="Digite a resposta..."></textarea>' +
                     '<label>Próximo enigma ou instrução:</label>' +
-                    '<textarea id="puz-' + realIndex + '" rows="2" placeholder="Digite o próximo desdobramento...">' + escapeHtml(m.nextPuzzle || '') + '</textarea>' +
+                    '<textarea id="puz-' + realIndex + '" rows="2" placeholder="Digite o próximo desdobramento..."></textarea>' +
+                    '<span class="more-btn" onclick="window.catblackToggleMore(' + realIndex + ')">Mais</span>' +
+                    '<div class="expandable-area" id="expand-' + realIndex + '">' +
+                    '<div class="file-input-wrap">' +
+                    '<input type="file" id="file-' + realIndex + '" accept="image/*" multiple onchange="window.catblackHandleFileSelect(this,' + realIndex + ')">' +
+                    '</div>' +
+                    previewHtml +
+                    '</div>' +
                     '<button onclick="window.catblackSaveResponse(' + realIndex + ')">Vincular Resposta à Chave</button>' +
+                    '</div>' +
+                    '</div>' +
+                    warningHtml +
                     '</div>' +
                     '</div>'
                 );
             }).join('');
         }
 
+        window.catblackToggleMore = function(index) {
+            var expand = document.getElementById('expand-' + index);
+            if (expand) {
+                expand.classList.toggle('open');
+            }
+        };
+
+        window.catblackStartDraft = function(index) {
+            var draftArea = document.getElementById('draft-' + index);
+            if (draftArea) {
+                draftArea.classList.remove('collapsed');
+            }
+        };
+
+        window.catblackHandleFileSelect = function(input, index) {
+            if (!input.files || input.files.length === 0) return;
+            if (!draftAttachments[index]) draftAttachments[index] = [];
+
+            var files = Array.from(input.files);
+            var processed = 0;
+
+            files.forEach(function(file) {
+                if (!file.type.startsWith('image/')) return;
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    draftAttachments[index].push(e.target.result);
+                    processed++;
+                    if (processed === files.length || processed > 0) {
+                        renderAdminMessages();
+                        // Reabre a área expandida após re-render
+                        setTimeout(function() {
+                            var expand = document.getElementById('expand-' + index);
+                            if (expand) expand.classList.add('open');
+                            var draftArea = document.getElementById('draft-' + index);
+                            if (draftArea) draftArea.classList.remove('collapsed');
+                        }, 50);
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        };
+
+        window.catblackRemoveAttachment = function(index, attIndex) {
+            if (draftAttachments[index]) {
+                draftAttachments[index].splice(attIndex, 1);
+                renderAdminMessages();
+                setTimeout(function() {
+                    var expand = document.getElementById('expand-' + index);
+                    if (expand) expand.classList.add('open');
+                    var draftArea = document.getElementById('draft-' + index);
+                    if (draftArea) draftArea.classList.remove('collapsed');
+                }, 50);
+            }
+        };
+
         window.catblackSaveResponse = function(index) {
             var respEl = document.getElementById('resp-' + index);
             var puzEl = document.getElementById('puz-' + index);
-            if (!respEl || !puzEl) return;
+            if (!respEl) return;
 
             var response = respEl.value.trim();
-            var puzzle = puzEl.value.trim();
+            if (!response) {
+                alert('Digite uma resposta antes de vincular.');
+                return;
+            }
 
-            db.messages[index].response = response || null;
-            db.messages[index].nextPuzzle = puzzle || null;
-            db.messages[index].answered = !!response;
+            var puzzle = puzEl ? puzEl.value.trim() : '';
+            var attachments = draftAttachments[index] || [];
+
+            if (!db.messages[index].responses) {
+                db.messages[index].responses = [];
+            }
+
+            db.messages[index].responses.push({
+                text: response,
+                puzzle: puzzle || null,
+                attachments: attachments,
+                timestamp: new Date().toISOString()
+            });
+
+            db.messages[index].answered = true;
+
+            // Limpa rascunho
+            draftAttachments[index] = [];
 
             saveDB();
             renderAdminMessages();
@@ -1330,7 +1655,6 @@ try {
         function activateGlow() {
             if (!isIdle || isCooldownActive() || eggLocked) return;
             elsEgg.borderGlow.classList.add("active");
-            // Suavemente remove o texto de inatividade 2 quando as bordas surgem
             if (els.idle2 && els.idle2.classList.contains('visible')) {
                 els.idle2.style.transition = 'opacity 2.5s ease-in-out';
                 els.idle2.style.opacity = '0';
@@ -1354,7 +1678,6 @@ try {
                 els.catArt.style.opacity = "0";
             }
 
-            // Garante que o texto de inatividade está totalmente oculto
             if (els.idle2) {
                 els.idle2.classList.remove('visible');
                 els.idle2.style.opacity = '';
@@ -1378,6 +1701,10 @@ try {
                 requestAnimationFrame(function() {
                     el.style.opacity = "1";
                 });
+                // Inicia transição suave de vermelho para branco após 300ms
+                setTimeout(function() {
+                    el.classList.add("settled");
+                }, 300);
                 el.addEventListener("click", handleEggClick);
             }
         }
@@ -1419,11 +1746,9 @@ try {
             elsEgg.burnOverlay.classList.add("active");
             document.body.classList.add("flicker-bg");
 
-            // Deixa o conteúdo principal meio opaco para destacar o texto preto
             els.mainWrapper.style.transition = "opacity 2s ease-in-out";
             els.mainWrapper.style.opacity = "0.25";
 
-            // As letras voam e somem aos poucos
             var allContent = document.querySelectorAll("#main-wrapper > *");
             allContent.forEach(function(el, i) {
                 setTimeout(function() {
@@ -1437,22 +1762,26 @@ try {
                 elsEgg.burnText.classList.add("visible");
             }, 2000);
 
-            // Após 2s: muda suavemente para "irrompe a turva torrente"
+            // Inicia fade out do primeiro texto
             setTimeout(function() {
                 elsEgg.burnText.style.transition = "opacity 1.5s ease-in-out";
                 elsEgg.burnText.style.opacity = "0";
-                setTimeout(function() {
-                    elsEgg.burnText.textContent = "irrompe a turva torrente";
-                    elsEgg.burnText.style.opacity = "1";
-                }, 1500);
             }, 4000);
 
-            // Após 2s: some suavemente
+            // Mostra segundo texto após fade out completo
             setTimeout(function() {
-                elsEgg.burnText.style.opacity = "0";
+                elsEgg.burnText.style.transition = "opacity 1s ease-in-out";
+                elsEgg.burnText.textContent = "irrompe a turva torrente";
+                elsEgg.burnText.style.opacity = "1";
             }, 6000);
 
-            // Restaura o site após a sequência completa
+            // Fade out do segundo texto (mesmo tempo de exibição do primeiro)
+            setTimeout(function() {
+                elsEgg.burnText.style.transition = "opacity 1.5s ease-in-out";
+                elsEgg.burnText.style.opacity = "0";
+            }, 8000);
+
+            // Restaura o site
             setTimeout(function() {
                 restoreSite();
             }, 10000);
@@ -1464,6 +1793,7 @@ try {
             elsEgg.borderGlow.classList.remove("flicker", "active");
             elsEgg.burnText.classList.remove("visible", "fade-out-slow");
             elsEgg.burnText.style.opacity = "";
+            elsEgg.burnText.style.transition = "";
             elsEgg.burnText.textContent = "";
 
             var allContent = document.querySelectorAll("#main-wrapper > *");
@@ -1478,6 +1808,13 @@ try {
                 els.catArt.style.transition = "";
             }
 
+            // LIMPA OPACIDADE RESIDUAL DO MAIN WRAPPER
+            els.mainWrapper.style.opacity = "";
+            els.mainWrapper.style.transition = "";
+
+            // Libera o eggLocked para permitir futuras ativações (cooldown ainda vigora)
+            eggLocked = false;
+
             isIdle = false;
             els.mainWrapper.classList.remove("faded");
             els.idle1.classList.remove("visible");
@@ -1489,9 +1826,6 @@ try {
         resetInactivity = function() {
             originalResetInactivity();
             if (deepIdleActive && !eggActive) {
-                // Após 6 min (deep idle), atividade não cancela o Easter Egg
-                // Mantém as bordas em luz sintilante e o egg container visível
-                // Apenas reinicia os timers de monitoramento
                 stopEggTimers();
                 startEggTimers();
                 return;
