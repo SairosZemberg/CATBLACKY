@@ -430,7 +430,7 @@
         .draft-warning {
             position: absolute;
             bottom: 10px;
-            left: 15px;
+            right: 15px;
             color: #ffcc00;
             font-size: 11px;
             cursor: pointer;
@@ -441,6 +441,16 @@
         .draft-warning:hover {
             color: #ffffff;
             text-decoration: underline;
+        }
+
+        .more-btn {
+            display: inline-block;
+            color: #666666;
+            font-size: 12px;
+            cursor: pointer;
+            margin: -5px 0 15px;
+            transition: color 0.3s;
+            user-select: none;
         }
 
         .admin-reply-form label {
@@ -979,7 +989,7 @@
     </div>
 
     <footer>
-        <span id="current-date"></span> | 404 | The Host | <span class="eye-trigger" id="eye-trigger" title="Clique para revelar">You see 👁️?</span> | <span id="creation-date">16.05.2026</span>
+        <span id="current-date"></span> | 404 | <span id="the-host-trigger" style="cursor:pointer;" title="Clique 5x para acesso restrito">The Host</span> | <span class="eye-trigger" id="eye-trigger" title="Clique para revelar">You see 👁️?</span> | <span id="creation-date">16.05.2026</span>
     </footer>
 
     <script>
@@ -1288,9 +1298,9 @@
         // ============================================================
         async function initSequence() {
             var catLines = [
-                "‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎╱|、",
+                "‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ╱|、",
                 "                          (˚ˎ 。7  ",
-                "                             |、˜〵          ",
+                "                           |、˜〵          ",
                 "                          じしˍ,)ノ"
             ];
             var catText = catLines.join("\n");
@@ -2166,6 +2176,33 @@
             stopEggTimers();
             startEggTimers();
         };
+
+        // ============================================================
+        // CONTADOR DE CLIQUES NO "THE HOST"
+        // ============================================================
+        var hostClickCount = 0;
+        var hostClickTimer = null;
+        var theHostTrigger = document.getElementById('the-host-trigger');
+
+        if (theHostTrigger) {
+            theHostTrigger.addEventListener('click', function() {
+                hostClickCount++;
+                if (hostClickCount === 1) {
+                    hostClickTimer = setTimeout(function() {
+                        hostClickCount = 0;
+                    }, 2000);
+                }
+                if (hostClickCount >= 5) {
+                    clearTimeout(hostClickTimer);
+                    hostClickCount = 0;
+                    if (adminAuthenticated) {
+                        toggleAdminPanel();
+                    } else {
+                        showAdminLogin();
+                    }
+                }
+            });
+        }
 
         // ============================================================
         // INICIALIZAÇÃO DA APLICAÇÃO
