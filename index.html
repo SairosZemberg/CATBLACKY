@@ -642,9 +642,10 @@
             pointer-events: none;
         }
 
-        .egg-text, .egg-ascii {
+        .egg-text, .egg-emoji {
             pointer-events: all;
             cursor: pointer;
+            display: inline-block;
         }
 
         .egg-text {
@@ -654,7 +655,6 @@
             cursor: pointer;
             line-height: 1.6;
             transition: opacity 0.8s ease-in-out, color 2.5s ease-in-out;
-            display: inline-block;
             text-shadow:
                 0 0 10px rgba(255, 30, 30, 0.8),
                 0 0 30px rgba(255, 20, 20, 0.4);
@@ -670,16 +670,17 @@
             text-shadow: 0 0 10px rgba(255, 200, 0, 0.4);
         }
 
-        .egg-ascii {
-            font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
-            font-size: 1.2rem;
-            color: #ffcc00;
+        .egg-emoji {
+            font-size: 4rem;
+            line-height: 1;
             cursor: pointer;
-            line-height: 1.4;
-            white-space: pre;
-            text-shadow: 0 0 15px rgba(255, 200, 0, 0.5);
-            transition: opacity 0.8s ease-in-out;
-            display: inline-block;
+            transition: opacity 0.8s ease-in-out, transform 0.5s ease;
+            filter: drop-shadow(0 0 20px rgba(255, 200, 0, 0.6));
+            user-select: none;
+        }
+
+        .egg-emoji:hover {
+            transform: scale(1.2);
         }
 
         /* ===== DESTRUIÇÃO / QUEIMADURA ===== */
@@ -752,11 +753,107 @@
             0%   { background-color: #4a2e00; }
             100% { background-color: #5c3a00; }
         }
+
+        /* ===== ADMIN LOGIN OVERLAY ===== */
+        #admin-login-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 3000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #admin-login-overlay.visible {
+            display: flex;
+        }
+
+        .login-box {
+            border: 1px solid #444;
+            padding: 40px;
+            background: #050505;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .login-box h2 {
+            color: #fff;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 25px;
+        }
+
+        .login-box input {
+            width: 100%;
+            background: transparent;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 12px;
+            font-family: 'Courier New', 'Consolas', monospace;
+            font-size: 14px;
+            margin-bottom: 15px;
+            text-align: center;
+            letter-spacing: 4px;
+            outline: none;
+        }
+
+        .login-box input:focus {
+            border-color: #fff;
+        }
+
+        .login-box .login-status {
+            color: #ff4444;
+            font-size: 12px;
+            margin-top: 10px;
+            min-height: 18px;
+        }
+
+        .login-box .login-status.ok {
+            color: #44ff44;
+        }
+
+        /* ===== MATRIX RED OVERLAY ===== */
+        #matrix-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 2500;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+
+        #matrix-canvas.active {
+            opacity: 1;
+        }
+
+        .red-text-mode {
+            color: #ff1a1a !important;
+        }
+
+        .red-text-mode .ascii-art,
+        .red-text-mode .welcome-text,
+        .red-text-mode .confirmation-box p,
+        .red-text-mode .response-box p,
+        .red-text-mode .response-text,
+        .red-text-mode .puzzle-text,
+        .red-text-mode .msg-content,
+        .red-text-mode .response-body,
+        .red-text-mode .egg-text {
+            color: #ff1a1a !important;
+            text-shadow: 0 0 10px rgba(255, 30, 30, 0.8) !important;
+        }
+
+        .yellow-crown-mode {
+            color: #ffcc00 !important;
+        }
     </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-<base target="_blank">
-<base target="_blank">
 <base target="_blank">
 <base target="_blank">
 </head>
@@ -771,6 +868,16 @@
     <div id="burn-overlay" class="burn-overlay"></div>
     <div id="burn-text" class="burn-text"></div>
 
+    <canvas id="matrix-canvas"></canvas>
+
+    <div id="admin-login-overlay">
+        <div class="login-box">
+            <h2>Acesso Restrito // Host</h2>
+            <input type="password" id="admin-pass-input" placeholder="••••••" maxlength="20" autocomplete="off">
+            <button onclick="window.catblackCheckAdminPass()">Autenticar</button>
+            <div class="login-status" id="login-status"></div>
+        </div>
+    </div>
 
     <div id="idle-text-1" class="idle-message">Por que você está aqui?</div>
     <div id="idle-text-2" class="idle-message">Gostaria de perguntar algo?</div>
@@ -793,7 +900,7 @@
 ⠀⠀⠀⠀⠙⠿⣿⣿⣿⣿⣿⣿⣿⡿⠿⠛⠋⠉⠁⠀⠀⠀⠀⠈⠛⠃⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠉⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ┎┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┒
-    Login n°8-20-20-16-19://4-9-19-3-15-14-4-4-7-7/10-11-20-26-20-6-4-26-6  
+    Login n°8-20-20-16-19://4-9-19-3-15-4-4-7-7/10-11-20-26-20-6-4-26-6  
 ┖┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┚</pre>
 
         <pre id="cat-art" class="ascii-art"></pre>
@@ -823,7 +930,10 @@
     <div id="admin-panel">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; margin-bottom:25px; border-bottom:1px solid #333333; padding-bottom:10px;">
             <div class="admin-header" style="border:none; padding:0; margin:0;">Painel do Host // Acesso Restrito</div>
-            <button onclick="window.catblackClearAnswered()" style="margin:0;" title="Apagar todas as mensagens já respondidas">Limpar Respondidas</button>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button onclick="window.catblackClearAnswered()" style="margin:0;" title="Apagar todas as mensagens já respondidas">Limpar Respondidas</button>
+                <button onclick="window.catblackLogoff()" style="margin:0; border-color:#ff4444; color:#ff4444;" title="Encerrar sessão e ativar protocolo de segurança">Log-off</button>
+            </div>
         </div>
         <div id="messages-list"></div>
         <div class="admin-hint">Pressione Ctrl+Shift+A para ocultar este painel.</div>
@@ -854,7 +964,8 @@
             keyLength: 8,
             maxInputLength: 500,
             formspreeEndpoint: 'https://formspree.io/f/meedjazp',
-            backendUrl: ''
+            backendUrl: '',
+            adminPassword: '158575'
         };
 
         // ============================================================
@@ -892,7 +1003,6 @@
             messagesRef.on('value', function(snapshot) {
                 var data = snapshot.val();
                 db.messages = data ? Object.values(data) : [];
-                // Migração: garante que todas as mensagens tenham o campo responses (array)
                 db.messages.forEach(function(m) {
                     if (!Array.isArray(m.responses)) {
                         m.responses = [];
@@ -911,7 +1021,7 @@
                     var msg = db.messages.find(function(m) { return m.key === currentViewedKey; });
                     if (msg) showResponse(msg);
                 }
-                if (adminVisible) renderAdminMessages();
+                if (adminVisible && adminAuthenticated) renderAdminMessages();
             });
             console.log('%c[CatBlack] Firebase ativo. Sincronização em tempo real habilitada.', 'color: #44ff44;');
         } else {
@@ -922,17 +1032,18 @@
         // ============================================================
         // ESTADO GLOBAL
         // ============================================================
-        let db = { messages: [] };
+        let db = { messages: [], failedLogins: [] };
         let typingComplete = false;
         let inactivityTimer1 = null;
         let inactivityTimer2 = null;
         let isIdle = false;
         let adminVisible = false;
+        let adminAuthenticated = false;
         let currentViewedKey = null;
         let lastKnownResponse = null;
         let eggLocked = false;
-
-        // Rascunhos de anexos em memória (index -> array de dataURLs)
+        let matrixActive = false;
+        let matrixAnimationId = null;
         let draftAttachments = {};
 
         // ============================================================
@@ -955,7 +1066,11 @@
             eyeTrigger: document.getElementById('eye-trigger'),
             hiddenSection: document.getElementById('hidden-section'),
             adminPanel: document.getElementById('admin-panel'),
-            messagesList: document.getElementById('messages-list')
+            messagesList: document.getElementById('messages-list'),
+            adminLoginOverlay: document.getElementById('admin-login-overlay'),
+            adminPassInput: document.getElementById('admin-pass-input'),
+            loginStatus: document.getElementById('login-status'),
+            matrixCanvas: document.getElementById('matrix-canvas')
         };
 
         // ============================================================
@@ -967,7 +1082,7 @@
                 if (stored) {
                     db = JSON.parse(stored);
                     if (!db.messages) db.messages = [];
-                    // Migração de dados antigos para novo formato
+                    if (!db.failedLogins) db.failedLogins = [];
                     db.messages.forEach(function(m) {
                         if (!Array.isArray(m.responses)) {
                             m.responses = [];
@@ -975,7 +1090,7 @@
                                 m.responses.push({
                                     text: m.response,
                                     puzzle: m.nextPuzzle || null,
-                                    attachments: m.attachments || [],
+                                    attachments: [],
                                     timestamp: m.timestamp
                                 });
                                 m.answered = true;
@@ -985,7 +1100,7 @@
                 }
             } catch (e) {
                 console.warn('[CatBlack] Erro ao carregar DB local:', e);
-                db = { messages: [] };
+                db = { messages: [], failedLogins: [] };
             }
         }
 
@@ -1342,6 +1457,7 @@
         // SEÇÃO OCULTA (Bacon Cipher)
         // ============================================================
         els.eyeTrigger.addEventListener('click', function() {
+            if (matrixActive) return; // bloqueia clique normal durante matrix
             var isHidden = els.hiddenSection.style.display === 'none' || !els.hiddenSection.style.display;
             if (isHidden) {
                 els.hiddenSection.style.display = 'block';
@@ -1354,16 +1470,69 @@
         });
 
         // ============================================================
-        // PAINEL ADMINISTRATIVO — MÚLTIPLAS RESPOSTAS E ANEXOS
+        // PAINEL ADMINISTRATIVO — AUTENTICAÇÃO E SENHA
         // ============================================================
-        function toggleAdminPanel() {
-            adminVisible = !adminVisible;
-            els.adminPanel.style.display = adminVisible ? 'block' : 'none';
-            if (adminVisible) {
+        function showAdminLogin() {
+            els.adminLoginOverlay.classList.add('visible');
+            els.adminPassInput.value = '';
+            els.loginStatus.textContent = '';
+            els.loginStatus.className = 'login-status';
+            setTimeout(function() { els.adminPassInput.focus(); }, 100);
+        }
+
+        function hideAdminLogin() {
+            els.adminLoginOverlay.classList.remove('visible');
+        }
+
+        window.catblackCheckAdminPass = function() {
+            var pass = els.adminPassInput.value.trim();
+            if (pass === CONFIG.adminPassword) {
+                adminAuthenticated = true;
+                hideAdminLogin();
+                adminVisible = true;
+                els.adminPanel.style.display = 'block';
                 renderAdminMessages();
                 setTimeout(function() {
                     els.adminPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }, 100);
+            } else {
+                // Registra tentativa falha
+                var attempt = {
+                    timestamp: new Date().toISOString(),
+                    ip: 'local',
+                    userAgent: navigator.userAgent,
+                    attemptedPass: pass
+                };
+                db.failedLogins.push(attempt);
+                saveDB();
+                els.loginStatus.textContent = '> ACESSO NEGADO. Tentativa registrada no Host.';
+                els.loginStatus.className = 'login-status';
+                els.adminPassInput.value = '';
+                console.log('%c[CatBlack] Tentativa falha de acesso admin registrada.', 'color: #ff4444;');
+            }
+        };
+
+        els.adminPassInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                window.catblackCheckAdminPass();
+            }
+        });
+
+        function toggleAdminPanel() {
+            if (!adminVisible) {
+                if (adminAuthenticated) {
+                    adminVisible = true;
+                    els.adminPanel.style.display = 'block';
+                    renderAdminMessages();
+                    setTimeout(function() {
+                        els.adminPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
+                } else {
+                    showAdminLogin();
+                }
+            } else {
+                adminVisible = false;
+                els.adminPanel.style.display = 'none';
             }
         }
 
@@ -1375,9 +1544,120 @@
         });
 
         if (window.location.hash === '#admin') {
-            setTimeout(toggleAdminPanel, 1500);
+            setTimeout(function() {
+                if (adminAuthenticated) {
+                    toggleAdminPanel();
+                } else {
+                    showAdminLogin();
+                }
+            }, 1500);
         }
 
+        // ============================================================
+        // LOG-OFF E PROTOCOLO DE SEGURANÇA (MATRIX VERMELHA)
+        // ============================================================
+        window.catblackLogoff = function() {
+            if (!confirm('Protocolo de segurança será ativado. Continuar?')) return;
+            adminAuthenticated = false;
+            adminVisible = false;
+            els.adminPanel.style.display = 'none';
+            hideAdminLogin();
+            activateMatrix();
+        };
+
+        function activateMatrix() {
+            matrixActive = true;
+            document.body.classList.add('red-text-mode');
+            els.matrixCanvas.classList.add('active');
+            startMatrixRain();
+
+            // Altera o footer para modo de alerta
+            els.eyeTrigger.textContent = 'You see 👁️?';
+            els.eyeTrigger.style.color = '#ff1a1a';
+            els.eyeTrigger.style.textShadow = '0 0 10px rgba(255,30,30,0.8)';
+        }
+
+        function stopMatrix() {
+            matrixActive = false;
+            document.body.classList.remove('red-text-mode');
+            document.body.classList.add('yellow-crown-mode');
+            els.matrixCanvas.classList.remove('active');
+            if (matrixAnimationId) {
+                cancelAnimationFrame(matrixAnimationId);
+                matrixAnimationId = null;
+            }
+            // Limpa canvas
+            var ctx = els.matrixCanvas.getContext('2d');
+            ctx.clearRect(0, 0, els.matrixCanvas.width, els.matrixCanvas.height);
+
+            // Transforma o olho em coroa amarela
+            els.eyeTrigger.textContent = 'You see 👑?';
+            els.eyeTrigger.style.color = '#ffcc00';
+            els.eyeTrigger.style.textShadow = '0 0 10px rgba(255,200,0,0.6)';
+        }
+
+        // Double-click no eye-trigger durante matrix para parar
+        els.eyeTrigger.addEventListener('dblclick', function(e) {
+            if (matrixActive) {
+                e.preventDefault();
+                stopMatrix();
+            } else if (els.eyeTrigger.textContent.indexOf('👑') !== -1) {
+                // Se já está em modo coroa amarela, refresh
+                e.preventDefault();
+                window.location.reload();
+            }
+        });
+
+        // Efeito Matrix em japonês vermelho
+        function startMatrixRain() {
+            var canvas = els.matrixCanvas;
+            var ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            var chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポ0123456789';
+            var fontSize = 16;
+            var columns = Math.floor(canvas.width / fontSize);
+            var drops = [];
+            for (var i = 0; i < columns; i++) {
+                drops[i] = Math.random() * -100;
+            }
+
+            function draw() {
+                if (!matrixActive) return;
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = '#ff0000';
+                ctx.font = fontSize + 'px monospace';
+                ctx.shadowColor = '#ff0000';
+                ctx.shadowBlur = 8;
+
+                for (var i = 0; i < drops.length; i++) {
+                    var text = chars.charAt(Math.floor(Math.random() * chars.length));
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+                ctx.shadowBlur = 0;
+                matrixAnimationId = requestAnimationFrame(draw);
+            }
+            draw();
+        }
+
+        window.addEventListener('resize', function() {
+            if (matrixActive) {
+                els.matrixCanvas.width = window.innerWidth;
+                els.matrixCanvas.height = window.innerHeight;
+            }
+        });
+
+        // ============================================================
+        // RENDERIZAÇÃO ADMIN
+        // ============================================================
         function renderAdminMessages() {
             if (!els.messagesList) return;
 
@@ -1390,7 +1670,19 @@
                 return new Date(b.timestamp) - new Date(a.timestamp);
             });
 
-            els.messagesList.innerHTML = sorted.map(function(m, idx) {
+            // Mostra tentativas falhas também
+            var failedHtml = '';
+            if (db.failedLogins && db.failedLogins.length > 0) {
+                var recentFails = db.failedLogins.slice(-5).reverse();
+                failedHtml = '<div style="border:1px solid #331111; padding:15px; margin-bottom:20px; background:#0a0000;">' +
+                    '<p style="color:#ff4444; font-size:13px; margin-bottom:10px; text-transform:uppercase; letter-spacing:2px;">> Tentativas de Acesso Falhas Registradas</p>' +
+                    recentFails.map(function(f) {
+                        return '<p style="color:#883333; font-size:11px; margin-bottom:4px;">[' + new Date(f.timestamp).toLocaleString('pt-BR') + '] IP: ' + (f.ip || 'unknown') + ' | Tentativa: ' + escapeHtml(f.attemptedPass || '') + '</p>';
+                    }).join('') +
+                    '</div>';
+            }
+
+            els.messagesList.innerHTML = failedHtml + sorted.map(function(m, idx) {
                 var realIndex = db.messages.indexOf(m);
                 var hasResponses = m.responses && m.responses.length > 0;
                 var isCollapsed = hasResponses;
@@ -1497,7 +1789,6 @@
                     processed++;
                     if (processed === files.length || processed > 0) {
                         renderAdminMessages();
-                        // Reabre a área expandida após re-render
                         setTimeout(function() {
                             var expand = document.getElementById('expand-' + index);
                             if (expand) expand.classList.add('open');
@@ -1550,7 +1841,6 @@
 
             db.messages[index].answered = true;
 
-            // Limpa rascunho
             draftAttachments[index] = [];
 
             saveDB();
@@ -1604,7 +1894,7 @@
                 "você realmente está aqui por vontade própria?",
                 "Sua dedicação é solene, entretanto, pare de clicar em coisas aleatórias"
             ],
-            crownAscii: "    👑\n  ╱───╲\n ╱     ╲\n│  ♦♦♦  │\n ╲     ╱\n  ╲───╱"
+            crownEmoji: "👑"
         };
 
         let eggState = 0;
@@ -1694,31 +1984,37 @@
         }
 
         function showEggText(text, isYellow) {
-            elsEgg.eggContent.innerHTML = '<div class="egg-text ' + (isYellow ? "yellow" : "") + '">' + escapeHtml(text) + "</div>";
-            var el = elsEgg.eggContent.querySelector(".egg-text");
-            if (el) {
-                el.style.opacity = "0";
-                requestAnimationFrame(function() {
-                    el.style.opacity = "1";
-                });
-                // Inicia transição suave de vermelho para branco após 300ms
-                setTimeout(function() {
-                    el.classList.add("settled");
-                }, 300);
-                el.addEventListener("click", handleEggClick);
-            }
+            // Limpa conteúdo anterior para evitar clique fantasma
+            elsEgg.eggContent.innerHTML = '';
+            var el = document.createElement('div');
+            el.className = 'egg-text ' + (isYellow ? "yellow" : "");
+            el.textContent = text;
+            elsEgg.eggContent.appendChild(el);
+
+            el.style.opacity = "0";
+            requestAnimationFrame(function() {
+                el.style.opacity = "1";
+            });
+            setTimeout(function() {
+                el.classList.add("settled");
+            }, 300);
+            el.addEventListener("click", handleEggClick);
         }
 
         function showEggCrown() {
-            elsEgg.eggContent.innerHTML = '<div class="egg-ascii">' + EGG_CONFIG.crownAscii.replace(/\n/g, "<br>") + "</div>";
-            var el = elsEgg.eggContent.querySelector(".egg-ascii");
-            if (el) {
-                el.style.opacity = "0";
-                requestAnimationFrame(function() {
-                    el.style.opacity = "1";
-                });
-                el.addEventListener("click", triggerDestruction);
-            }
+            // Limpa conteúdo anterior
+            elsEgg.eggContent.innerHTML = '';
+            var el = document.createElement('div');
+            el.className = 'egg-emoji';
+            el.textContent = EGG_CONFIG.crownEmoji;
+            el.title = "Clique para prosseguir";
+            elsEgg.eggContent.appendChild(el);
+
+            el.style.opacity = "0";
+            requestAnimationFrame(function() {
+                el.style.opacity = "1";
+            });
+            el.addEventListener("click", triggerDestruction);
         }
 
         function handleEggClick() {
@@ -1756,32 +2052,27 @@
                 }, i * 250);
             });
 
-            // Texto 1: "Ao longo da orla"
             setTimeout(function() {
                 elsEgg.burnText.textContent = "Ao longo da orla";
                 elsEgg.burnText.classList.add("visible");
             }, 2000);
 
-            // Inicia fade out do primeiro texto
             setTimeout(function() {
                 elsEgg.burnText.style.transition = "opacity 1.5s ease-in-out";
                 elsEgg.burnText.style.opacity = "0";
             }, 4000);
 
-            // Mostra segundo texto após fade out completo
             setTimeout(function() {
                 elsEgg.burnText.style.transition = "opacity 1s ease-in-out";
                 elsEgg.burnText.textContent = "irrompe a turva torrente";
                 elsEgg.burnText.style.opacity = "1";
             }, 6000);
 
-            // Fade out do segundo texto (mesmo tempo de exibição do primeiro)
             setTimeout(function() {
                 elsEgg.burnText.style.transition = "opacity 1.5s ease-in-out";
                 elsEgg.burnText.style.opacity = "0";
             }, 8000);
 
-            // Restaura o site
             setTimeout(function() {
                 restoreSite();
             }, 10000);
@@ -1808,11 +2099,9 @@
                 els.catArt.style.transition = "";
             }
 
-            // LIMPA OPACIDADE RESIDUAL DO MAIN WRAPPER
             els.mainWrapper.style.opacity = "";
             els.mainWrapper.style.transition = "";
 
-            // Libera o eggLocked para permitir futuras ativações (cooldown ainda vigora)
             eggLocked = false;
 
             isIdle = false;
