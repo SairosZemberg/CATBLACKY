@@ -816,6 +816,32 @@
             color: #44ff44;
         }
 
+        .login-close-btn {
+            position: absolute;
+            top: 12px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            width: 28px;
+            height: 28px;
+            line-height: 28px;
+            text-align: center;
+            transition: color 0.3s;
+            font-family: sans-serif;
+        }
+
+        .login-close-btn:hover {
+            color: #fff;
+        }
+
+        .login-box {
+            position: relative;
+        }
+
         /* ===== MATRIX RED OVERLAY ===== */
         #matrix-container {
             position: fixed;
@@ -880,6 +906,7 @@
 
     <div id="admin-login-overlay">
         <div class="login-box">
+            <button class="login-close-btn" onclick="window.catblackCloseLogin()" title="Fechar">×</button>
             <h2>Acesso Restrito // Host</h2>
             <input type="password" id="admin-pass-input" placeholder="••••••" maxlength="20" autocomplete="off">
             <button onclick="window.catblackCheckAdminPass()">Autenticar</button>
@@ -1263,7 +1290,7 @@
             var catLines = [
                 "‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ╱|、",
                 "                          (˚ˎ 。7  ",
-                "                           |、˜〵          ",
+                "                            |、˜〵          ",
                 "                          じしˍ,)ノ"
             ];
             var catText = catLines.join("\n");
@@ -1491,6 +1518,13 @@
         function hideAdminLogin() {
             els.adminLoginOverlay.classList.remove('visible');
         }
+
+        window.catblackCloseLogin = function() {
+            hideAdminLogin();
+            els.adminPassInput.value = '';
+            els.loginStatus.textContent = '';
+            els.loginStatus.className = 'login-status';
+        };
 
         window.catblackCheckAdminPass = function() {
             var pass = els.adminPassInput.value.trim();
