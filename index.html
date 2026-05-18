@@ -251,6 +251,26 @@
             border-top: 1px solid #111111;
             width: 100%;
             letter-spacing: 0.5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .footer-sep {
+            color: #333;
+            user-select: none;
+            margin: 0 4px;
+        }
+
+        #the-host-text {
+            color: #555555;
+            transition: color 0.3s;
+        }
+
+        #the-host-text:hover {
+            color: #777777;
         }
 
         .eye-trigger {
@@ -448,9 +468,21 @@
             color: #666666;
             font-size: 12px;
             cursor: pointer;
-            margin: -5px 0 15px;
+            margin: 0;
             transition: color 0.3s;
             user-select: none;
+            position: absolute;
+            bottom: 10px;
+            left: 15px;
+        }
+
+        .more-btn:hover {
+            color: #aaaaaa;
+        }
+
+        .admin-reply-form {
+            position: relative;
+            padding-bottom: 40px;
         }
 
         .admin-reply-form label {
@@ -892,8 +924,157 @@
             text-shadow: 0 0 10px rgba(255, 30, 30, 0.8) !important;
         }
 
+        /* ===== MODO VERMELHO TOTAL (após duplo clique no olho) ===== */
+        .red-content-mode,
+        .red-content-mode .ascii-art,
+        .red-content-mode #welcome-text,
+        .red-content-mode #message-input,
+        .red-content-mode #message-input::placeholder,
+        .red-content-mode button,
+        .red-content-mode .confirmation-box,
+        .red-content-mode .response-box,
+        .red-content-mode .confirmation-box p,
+        .red-content-mode .response-box p,
+        .red-content-mode .response-text,
+        .red-content-mode .puzzle-text,
+        .red-content-mode .key-highlight,
+        .red-content-mode .status-ok,
+        .red-content-mode .status-wait,
+        .red-content-mode .status-err,
+        .red-content-mode footer,
+        .red-content-mode .eye-trigger,
+        .red-content-mode .idle-message {
+            color: #ff1a1a !important;
+            border-color: #ff1a1a !important;
+            text-shadow: 0 0 8px rgba(255, 30, 30, 0.6) !important;
+        }
+
+        .red-content-mode #message-input {
+            caret-color: #ff1a1a !important;
+        }
+
+        .red-content-mode button:hover {
+            background-color: #1a0000 !important;
+            border-color: #ff4444 !important;
+        }
+
+        .red-content-mode .key-highlight {
+            border-color: #ff1a1a !important;
+        }
+
+        .red-content-mode .response-text {
+            border-left-color: #ff1a1a !important;
+        }
+
+        .red-content-mode .puzzle-text {
+            border-color: #ff1a1a !important;
+        }
+
+        .red-content-mode .confirmation-box,
+        .red-content-mode .response-box {
+            border-color: #ff1a1a !important;
+            background-color: #0a0000 !important;
+        }
+
         .yellow-crown-mode {
-            color: #ffcc00 !important;
+            /* Filtro amarelado aplicado via JS no body, não em textos individuais */
+        }
+
+        /* ===== BOTÃO 404 / CIFRA ===== */
+        .cipher-trigger {
+            cursor: pointer;
+            color: #777777;
+            transition: color 0.4s, text-shadow 0.4s;
+            text-decoration: none;
+            user-select: none;
+            padding: 2px 6px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .cipher-trigger:hover {
+            color: #ffffff;
+            border-color: #444;
+            background: rgba(255,255,255,0.03);
+            text-shadow: 0 0 8px rgba(255,255,255,0.3);
+        }
+
+        #cipher-section {
+            display: none;
+            width: 100%;
+            max-width: 950px;
+            margin: 0 auto;
+            padding: 0 20px 50px;
+        }
+
+        .cipher-content {
+            color: #000000;
+            background-color: #000000;
+            font-family: 'Courier New', 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            padding: 25px;
+            user-select: text;
+            -webkit-user-select: text;
+            word-wrap: break-word;
+            border: 1px solid #111111;
+            min-height: 60px;
+            transition: border-color 0.3s;
+        }
+
+        .cipher-content:hover {
+            border-color: #222222;
+        }
+
+        .cipher-content::selection {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        .cipher-content::-moz-selection {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        /* ===== HOST - EDITOR DE CIFRA ===== */
+        .host-cipher-editor {
+            border: 1px solid #333;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: #080808;
+        }
+
+        .host-cipher-editor label {
+            display: block;
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .host-cipher-editor textarea {
+            width: 100%;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 12px;
+            font-family: 'Courier New', 'Consolas', monospace;
+            font-size: 13px;
+            outline: none;
+            resize: vertical;
+            min-height: 80px;
+            margin-bottom: 10px;
+        }
+
+        .host-cipher-editor textarea:focus {
+            border-color: #555;
+        }
+
+        .host-cipher-editor .cipher-hint {
+            color: #444;
+            font-size: 11px;
+            margin-top: 8px;
         }
 
         /* ===== LIGHTBOX LOCAL ===== */
@@ -1061,16 +1242,36 @@
                 <button onclick="window.catblackLogoff()" style="margin:0; border-color:#ff4444; color:#ff4444;" title="Encerrar sessão e ativar protocolo de segurança">Log-off</button>
             </div>
         </div>
+
+        <!-- EDITOR DE CIFRA BACON -->
+        <div class="host-cipher-editor">
+            <label>Escrever Cifra // Mensagem Invisível</label>
+            <textarea id="host-cipher-input" placeholder="Digite a mensagem que será codificada em cifra Bacon (A/B)..."></textarea>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button id="host-cipher-save">Salvar Cifra</button>
+                <button id="host-cipher-delete" style="border-color:#ff4444; color:#ff4444;">Restaurar Padrão</button>
+            </div>
+            <p class="cipher-hint">A mensagem digitada será automaticamente codificada em cifra Bacon (A/B). Todos os visitantes verão a cifra atualizada.</p>
+        </div>
+
         <div id="messages-list"></div>
         <div class="admin-hint">Pressione Ctrl+Shift+A para ocultar este painel.</div>
     </div>
 
-    <div id="hidden-section">
-        <div class="hidden-cipher">BAABA AABAA ABBAA AABBB ABBAB AABAA BABAB AAAAA BAABA AAAAA BAAAB BAAAB AABAA ABAAA BAAAB ABABB AABAA BAAAB AABAA BAAAB AABAA BAAAB AABAA ABAAA BAAAB AAABB ABAAA AAAAA BAAAB AABAA ABBAA BAABA BAAAA AABAA AAAAA BAAAB BAABB ABBAB BABBB AABAA BAAAB ABBBB BAABB AABAA AABAA AAABA ABBAB AAAAA ABABB BAABA AABAA ABABB ABBAB ABBBB BAABB AABAA ABBAA ABBAB AAABB ABAAA AABBA AAAAA ABABB ABBAB ABBBB BAABB AABAA AABAA BAAAB BAABA ABBAB BAABB ABBBA BAAAA AABAA BAAAB BAABA AABAA BAAAB AAAAA AABAB AAAAA BABBB AABAA BAAAA ABBBA ABBAB ABAAA BAAAB ABABB AABAA BAAAB ABABB ABBAB AAABB ABAAA AAAAA ABBAA BAABA AABAA AAABB AABAA BAABA AAAAA ABAAA BAAAB BAAAB ABAAA BAAAB ABAAA ABBAA AABAA ABBBA BAABA ABBAB BAAAB ABBBA BAAAA ABBAB AAABA BAABB BAAAA AAAAA BAAAA AABAA ABAAA AAAAA AAAAA AABAB ABAAA BAAAA ABABB AAAAA ABBAB AAABA ABBAB AABAA BAAAA AABAA ABBAA BAABA AABAA</div>
+    <div id="cipher-section">
+        <div class="cipher-content" id="cipher-display">BAABA AABBB AABAA  AABBB ABBAB BAAAB BAABA  BAAAB AABAA AABAA BAAAB  AAAAA ABABA ABABA</div>
     </div>
 
     <footer>
-        <span id="current-date"></span> | 404 | <span id="the-host-trigger" style="cursor:pointer;" title="Clique 5x para acesso restrito">The Host</span> | <span class="eye-trigger" id="eye-trigger" title="Clique para revelar">You see 👁️?</span> | <span id="creation-date">16.05.2026</span>
+        <span id="current-date"></span> 
+        <span class="footer-sep">|</span> 
+        <span id="cipher-trigger" class="cipher-trigger" title="Clique para revelar a cifra Bacon (A/B)">404</span> 
+        <span class="footer-sep">|</span> 
+        <span id="the-host-text">The Host</span> 
+        <span class="footer-sep">|</span> 
+        <span class="eye-trigger" id="eye-trigger" title="Clique para revelar a cifra">You see 👁️?</span> 
+        <span class="footer-sep">|</span> 
+        <span id="creation-date">16.05.2026</span>
     </footer>
 
     <script>
@@ -1190,7 +1391,9 @@
             idle2: document.getElementById('idle-text-2'),
             currentDate: document.getElementById('current-date'),
             eyeTrigger: document.getElementById('eye-trigger'),
-            hiddenSection: document.getElementById('hidden-section'),
+            hiddenSection: document.getElementById('cipher-section'),  // seção da cifra Bacon
+            cipherDisplay: document.getElementById('cipher-display'),
+            cipherTrigger: document.getElementById('cipher-trigger'),
             adminPanel: document.getElementById('admin-panel'),
             messagesList: document.getElementById('messages-list'),
             adminLoginOverlay: document.getElementById('admin-login-overlay'),
@@ -1582,8 +1785,23 @@
         // ============================================================
         // SEÇÃO OCULTA (Bacon Cipher)
         // ============================================================
+        // "You see" - Revela/Esconde a cifra Bacon (comportamento original)
         els.eyeTrigger.addEventListener('click', function() {
-            if (matrixActive) return; // bloqueia clique normal durante matrix
+            if (matrixActive || eyeClickPhase > 0) return; // bloqueia durante matrix ou fases
+            var isHidden = els.hiddenSection.style.display === 'none' || !els.hiddenSection.style.display;
+            if (isHidden) {
+                els.hiddenSection.style.display = 'block';
+                setTimeout(function() {
+                    els.hiddenSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            } else {
+                els.hiddenSection.style.display = 'none';
+            }
+        });
+
+        // Botão 404 - Revela/Esconde a cifra Bacon
+        els.cipherTrigger.addEventListener('click', function() {
+            if (matrixActive || eyeClickPhase > 0) return;
             var isHidden = els.hiddenSection.style.display === 'none' || !els.hiddenSection.style.display;
             if (isHidden) {
                 els.hiddenSection.style.display = 'block';
@@ -1725,7 +1943,6 @@
         function stopMatrix() {
             matrixActive = false;
             document.body.classList.remove('red-text-mode');
-            document.body.classList.add('yellow-crown-mode');
             document.getElementById('matrix-container').classList.remove('active');
             if (matrixAnimationId) {
                 cancelAnimationFrame(matrixAnimationId);
@@ -1735,10 +1952,13 @@
             var ctx = els.matrixCanvas.getContext('2d');
             ctx.clearRect(0, 0, els.matrixCanvas.width, els.matrixCanvas.height);
 
-            // Transforma o olho em coroa amarela
-            els.eyeTrigger.textContent = 'You see 👑?';
-            els.eyeTrigger.style.color = '#ffcc00';
-            els.eyeTrigger.style.textShadow = '0 0 10px rgba(255,200,0,0.6)';
+            // Aplica modo vermelho total em todo o conteúdo
+            document.body.classList.add('red-content-mode');
+
+            // Mantém o olho vermelho (não transforma em coroa ainda)
+            els.eyeTrigger.textContent = 'You see 👁️?';
+            els.eyeTrigger.style.color = '#ff1a1a';
+            els.eyeTrigger.style.textShadow = '0 0 10px rgba(255,30,30,0.8)';
         }
 
         // ============================================================
@@ -1784,13 +2004,22 @@
             }
         });
 
-        // Double-click no eye-trigger durante matrix para parar
+        // Double-click no eye-trigger: comportamento por fase
         els.eyeTrigger.addEventListener('dblclick', function(e) {
             if (matrixActive) {
+                // Fase 1: durante a chuva matrix → para chuva, tudo fica vermelho
                 e.preventDefault();
                 stopMatrix();
+            } else if (document.body.classList.contains('red-content-mode')) {
+                // Fase 2: tudo já está vermelho → transforma em coroa amarela
+                e.preventDefault();
+                document.body.classList.remove('red-content-mode');
+                document.body.classList.add('yellow-crown-mode');
+                els.eyeTrigger.textContent = 'You see 👑?';
+                els.eyeTrigger.style.color = '#ffcc00';
+                els.eyeTrigger.style.textShadow = '0 0 10px rgba(255,200,0,0.6)';
             } else if (els.eyeTrigger.textContent.indexOf('👑') !== -1) {
-                // Se já está em modo coroa amarela, refresh
+                // Fase 3: coroa amarela ativa → refresh
                 e.preventDefault();
                 window.location.reload();
             }
@@ -1844,6 +2073,139 @@
                 els.matrixCanvas.height = container.clientHeight;
             }
         });
+
+        // ============================================================
+        // CIFRA BACON - CODIFICADOR/DECODIFICADOR
+        // ============================================================
+        const BACON_ALPHABET = {
+            'A': 'AAAAA', 'B': 'AAAAB', 'C': 'AAABA', 'D': 'AAABB',
+            'E': 'AABAA', 'F': 'AABAB', 'G': 'AABBA', 'H': 'AABBB',
+            'I': 'ABAAA', 'J': 'ABAAA', 'K': 'ABAAB', 'L': 'ABABA',
+            'M': 'ABABB', 'N': 'ABBAA', 'O': 'ABBAB', 'P': 'ABBBA',
+            'Q': 'ABBBB', 'R': 'BAAAA', 'S': 'BAAAB', 'T': 'BAABA',
+            'U': 'BAABB', 'V': 'BAABB', 'W': 'BABAA', 'X': 'BABAB',
+            'Y': 'BABBA', 'Z': 'BABBB'
+        };
+
+        function encodeBacon(text) {
+            var result = '';
+            var upper = text.toUpperCase();
+            for (var i = 0; i < upper.length; i++) {
+                var char = upper[i];
+                // Normaliza J->I e V->U para o alfabeto Bacon de 24 letras
+                if (char === 'J') char = 'I';
+                if (char === 'V') char = 'U';
+                if (BACON_ALPHABET[char]) {
+                    result += BACON_ALPHABET[char] + ' ';
+                } else if (char === ' ') {
+                    result += '  ';
+                }
+            }
+            return result.trim();
+        }
+
+        function decodeBacon(cipher) {
+            var clean = cipher.replace(/[^AB]/g, '');
+            var result = '';
+            for (var i = 0; i < clean.length; i += 5) {
+                var chunk = clean.substr(i, 5);
+                if (chunk.length === 5) {
+                    var found = false;
+                    for (var letter in BACON_ALPHABET) {
+                        if (BACON_ALPHABET[letter] === chunk) {
+                            result += letter;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) result += '?';
+                }
+            }
+            return result;
+        }
+
+        // ============================================================
+        // PERSISTÊNCIA DA CIFRA (Firebase / localStorage)
+        // ============================================================
+        function loadCipher() {
+            if (firebaseEnabled) {
+                var cipherRef = firebase.database().ref('system/cipherText');
+                cipherRef.once('value', function(snapshot) {
+                    var val = snapshot.val();
+                    if (val && val.content) {
+                        updateCipherDisplay(val.content);
+                    }
+                });
+                cipherRef.on('value', function(snapshot) {
+                    var val = snapshot.val();
+                    if (val && val.content) {
+                        updateCipherDisplay(val.content);
+                    }
+                });
+            } else {
+                var stored = localStorage.getItem('CATBLACK_CIPHER');
+                if (stored) {
+                    updateCipherDisplay(stored);
+                }
+            }
+        }
+
+        function saveCipher(text) {
+            if (firebaseEnabled) {
+                firebase.database().ref('system/cipherText').set({
+                    content: text,
+                    updatedAt: new Date().toISOString()
+                });
+            }
+            localStorage.setItem('CATBLACK_CIPHER', text);
+        }
+
+        function updateCipherDisplay(text) {
+            if (els.cipherDisplay) {
+                els.cipherDisplay.textContent = text;
+            }
+        }
+
+        // ============================================================
+        // EVENTOS DO EDITOR DE CIFRA NO HOST
+        // ============================================================
+        function setupCipherEditor() {
+            var editor = document.getElementById('host-cipher-input');
+            var saveBtn = document.getElementById('host-cipher-save');
+            var deleteBtn = document.getElementById('host-cipher-delete');
+
+            if (editor) {
+                // Carrega cifra atual no editor (decodificada para texto legível)
+                var current = els.cipherDisplay ? els.cipherDisplay.textContent : '';
+                var decoded = decodeBacon(current);
+                editor.value = decoded || '';
+
+                if (saveBtn) {
+                    saveBtn.addEventListener('click', function() {
+                        var text = editor.value.trim();
+                        if (!text) {
+                            alert('Digite uma mensagem para codificar.');
+                            return;
+                        }
+                        var encoded = encodeBacon(text);
+                        saveCipher(encoded);
+                        updateCipherDisplay(encoded);
+                        alert('Cifra atualizada e sincronizada.');
+                    });
+                }
+
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', function() {
+                        if (!confirm('Tem certeza que deseja apagar a cifra?')) return;
+                        var defaultCipher = 'BAABA AABBB AABAA  AABBB ABBAB BAAAB BAABA  BAAAB AABAA AABAA BAAAB  AAAAA ABABA ABABA';
+                        saveCipher(defaultCipher);
+                        updateCipherDisplay(defaultCipher);
+                        editor.value = '';
+                        alert('Cifra restaurada para o padrão.');
+                    });
+                }
+            }
+        }
 
         // ============================================================
         // RENDERIZAÇÃO ADMIN
@@ -2314,30 +2676,51 @@
         };
 
         // ============================================================
-        // CONTADOR DE CLIQUES NO "THE HOST"
+        // CONTADOR DE CLIQUES NO "THE HOST" (Easter Egg Alternativo)
         // ============================================================
         var hostClickCount = 0;
         var hostClickTimer = null;
-        var theHostTrigger = document.getElementById('the-host-trigger');
 
-        if (theHostTrigger) {
-            theHostTrigger.addEventListener('click', function() {
-                hostClickCount++;
-                if (hostClickCount === 1) {
-                    hostClickTimer = setTimeout(function() {
-                        hostClickCount = 0;
-                    }, 2000);
+        // Procura o texto "The Host" no footer
+        var footer = document.querySelector('footer');
+        if (footer) {
+            var theHostText = null;
+            var walker = document.createTreeWalker(footer, NodeFilter.SHOW_TEXT, null, false);
+            var node;
+            while (node = walker.nextNode()) {
+                if (node.textContent.indexOf('The Host') !== -1) {
+                    theHostText = node;
+                    break;
                 }
-                if (hostClickCount >= 5) {
-                    clearTimeout(hostClickTimer);
-                    hostClickCount = 0;
-                    if (adminAuthenticated) {
-                        toggleAdminPanel();
-                    } else {
-                        showAdminLogin();
+            }
+
+            if (theHostText) {
+                var span = document.createElement('span');
+                span.style.cursor = 'pointer';
+                span.style.userSelect = 'none';
+                span.title = 'Clique 5x para acesso restrito';
+                span.textContent = 'The Host';
+                theHostText.parentNode.insertBefore(span, theHostText);
+                theHostText.parentNode.removeChild(theHostText);
+
+                span.addEventListener('click', function() {
+                    hostClickCount++;
+                    if (hostClickCount === 1) {
+                        hostClickTimer = setTimeout(function() {
+                            hostClickCount = 0;
+                        }, 2000);
                     }
-                }
-            });
+                    if (hostClickCount >= 5) {
+                        clearTimeout(hostClickTimer);
+                        hostClickCount = 0;
+                        if (adminAuthenticated) {
+                            toggleAdminPanel();
+                        } else {
+                            showAdminLogin();
+                        }
+                    }
+                });
+            }
         }
 
         // ============================================================
@@ -2378,6 +2761,16 @@
         setTimeout(initSequence, 600);
         setInterval(updateCurrentDate, 60000);
         setupRefreshListener();
+        loadCipher();
+
+        // Setup editor de cifra quando painel admin abre
+        var originalToggleAdmin = toggleAdminPanel;
+        toggleAdminPanel = function() {
+            originalToggleAdmin();
+            if (adminVisible && adminAuthenticated) {
+                setTimeout(setupCipherEditor, 150);
+            }
+        };
 
         console.log('%cCatBlack // Sistema Inicializado', 'color: #666; font-family: monospace;');
 
