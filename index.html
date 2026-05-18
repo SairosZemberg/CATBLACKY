@@ -1698,8 +1698,16 @@
             adminVisible = false;
             els.adminPanel.style.display = 'none';
             hideAdminLogin();
-            // A matrix NÃO é ativada localmente para o Host
-            // Ela será ativada apenas para quem tentar acessar com senha errada
+            // Define flag de refresh global no DB
+            if (firebaseEnabled && messagesRef) {
+                firebase.database().ref('system/refreshSignal').set({
+                    triggeredAt: new Date().toISOString(),
+                    active: true
+                });
+            } else {
+                // Fallback localStorage para sincronização entre abas
+                localStorage.setItem('CATBLACK_REFRESH_SIGNAL', Date.now());
+            }
         };
 
         function activateMatrix() {
@@ -2333,6 +2341,35 @@
         }
 
         // ============================================================
+        // SINAL DE REFRESH GLOBAL (Log-off do Host)
+        // ============================================================
+        function setupRefreshListener() {
+            if (firebaseEnabled) {
+                var refreshRef = firebase.database().ref('system/refreshSignal');
+                refreshRef.on('value', function(snapshot) {
+                    var data = snapshot.val();
+                    if (data && data.active) {
+                        var lastRefresh = localStorage.getItem('CATBLACK_LAST_REFRESH');
+                        if (!lastRefresh || Date.now() - parseInt(lastRefresh) > 5000) {
+                            localStorage.setItem('CATBLACK_LAST_REFRESH', Date.now());
+                            window.location.reload();
+                        }
+                    }
+                });
+            }
+            // Listener cross-tab via localStorage
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'CATBLACK_REFRESH_SIGNAL') {
+                    var lastRefresh = localStorage.getItem('CATBLACK_LAST_REFRESH');
+                    if (!lastRefresh || Date.now() - parseInt(lastRefresh) > 3000) {
+                        localStorage.setItem('CATBLACK_LAST_REFRESH', Date.now());
+                        window.location.reload();
+                    }
+                }
+            });
+        }
+
+        // ============================================================
         // INICIALIZAÇÃO DA APLICAÇÃO
         // ============================================================
         loadCooldown();
@@ -2340,6 +2377,7 @@
         updateCurrentDate();
         setTimeout(initSequence, 600);
         setInterval(updateCurrentDate, 60000);
+        setupRefreshListener();
 
         console.log('%cCatBlack // Sistema Inicializado', 'color: #666; font-family: monospace;');
 
