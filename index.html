@@ -895,6 +895,78 @@
         .yellow-crown-mode {
             color: #ffcc00 !important;
         }
+
+        /* ===== LIGHTBOX LOCAL ===== */
+        #lightbox-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.92);
+            z-index: 4000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        #lightbox-overlay.visible {
+            display: flex;
+        }
+
+        #lightbox-img {
+            max-width: 90%;
+            max-height: 80vh;
+            object-fit: contain;
+            border: 1px solid #444;
+        }
+
+        .lightbox-controls {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            align-items: center;
+        }
+
+        .lightbox-btn {
+            background: transparent;
+            border: 1px solid #666;
+            color: #aaa;
+            font-family: 'Courier New', 'Consolas', monospace;
+            font-size: 13px;
+            padding: 8px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .lightbox-btn:hover {
+            border-color: #fff;
+            color: #fff;
+            background: #111;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 32px;
+            cursor: pointer;
+            font-family: sans-serif;
+            line-height: 1;
+            transition: color 0.3s;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+        }
+
+        .lightbox-close:hover {
+            color: #fff;
+        }
     </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -913,6 +985,15 @@
     <div id="burn-text" class="burn-text"></div>
 
     <div id="matrix-container"><canvas id="matrix-canvas"></canvas></div>
+
+    <div id="lightbox-overlay">
+        <button class="lightbox-close" onclick="window.catblackCloseLightbox()">×</button>
+        <img id="lightbox-img" src="" alt="">
+        <div class="lightbox-controls">
+            <button class="lightbox-btn" onclick="window.catblackDownloadImage()">Baixar</button>
+            <button class="lightbox-btn" onclick="window.catblackCloseLightbox()">Fechar</button>
+        </div>
+    </div>
 
     <div id="admin-login-overlay">
         <div class="login-box">
@@ -1301,7 +1382,7 @@
                 "‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ╱|、   ",
                 "                          (˚ˎ 。7  ",
                 "                          |、˜〵  ",
-                "                          じしˍ,)ノ "
+                "                          じしˍ,)ノ"
             ];
             var catText = catLines.join("\n");
 
@@ -1473,7 +1554,7 @@
                     if (resp.attachments && resp.attachments.length > 0) {
                         html += '<div style="display:flex; flex-wrap:wrap; gap:8px; margin:10px 0;">';
                         resp.attachments.forEach(function(att) {
-                            html += '<img src="' + att + '" style="width:120px; height:120px; object-fit:cover; border:1px solid #444;">';
+                            html += '<img src="' + att + '" style="width:120px; height:120px; object-fit:cover; border:1px solid #444; cursor:pointer;" onclick="window.catblackOpenLightbox(this.src)">';
                         });
                         html += '</div>';
                     }
@@ -1557,10 +1638,13 @@
                 };
                 db.failedLogins.push(attempt);
                 saveDB();
-                els.loginStatus.textContent = '> ACESSO NEGADO. Tentativa registrada no Host.';
+                els.loginStatus.textContent = '> ACESSO NEGADO. Protocolo de segurança ativado.';
                 els.loginStatus.className = 'login-status';
                 els.adminPassInput.value = '';
-                console.log('%c[CatBlack] Tentativa falha de acesso admin registrada.', 'color: #ff4444;');
+                console.log('%c[CatBlack] Tentativa falha de acesso admin. Protocolo ativado.', 'color: #ff4444;');
+                // Ativa matrix para quem errou a senha
+                hideAdminLogin();
+                activateMatrix();
             }
         };
 
@@ -1614,7 +1698,8 @@
             adminVisible = false;
             els.adminPanel.style.display = 'none';
             hideAdminLogin();
-            activateMatrix();
+            // A matrix NÃO é ativada localmente para o Host
+            // Ela será ativada apenas para quem tentar acessar com senha errada
         };
 
         function activateMatrix() {
@@ -1647,6 +1732,49 @@
             els.eyeTrigger.style.color = '#ffcc00';
             els.eyeTrigger.style.textShadow = '0 0 10px rgba(255,200,0,0.6)';
         }
+
+        // ============================================================
+        // LIGHTBOX LOCAL
+        // ============================================================
+        var currentLightboxSrc = '';
+
+        window.catblackOpenLightbox = function(src) {
+            currentLightboxSrc = src;
+            var overlay = document.getElementById('lightbox-overlay');
+            var img = document.getElementById('lightbox-img');
+            img.src = src;
+            overlay.classList.add('visible');
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.catblackCloseLightbox = function() {
+            var overlay = document.getElementById('lightbox-overlay');
+            var img = document.getElementById('lightbox-img');
+            overlay.classList.remove('visible');
+            img.src = '';
+            currentLightboxSrc = '';
+            document.body.style.overflow = '';
+        };
+
+        window.catblackDownloadImage = function() {
+            if (!currentLightboxSrc) return;
+            var a = document.createElement('a');
+            a.href = currentLightboxSrc;
+            a.download = 'catblack_' + Date.now() + '.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        };
+
+        // Fechar lightbox com ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                var overlay = document.getElementById('lightbox-overlay');
+                if (overlay && overlay.classList.contains('visible')) {
+                    window.catblackCloseLightbox();
+                }
+            }
+        });
 
         // Double-click no eye-trigger durante matrix para parar
         els.eyeTrigger.addEventListener('dblclick', function(e) {
@@ -1749,7 +1877,7 @@
                             if (r.attachments && r.attachments.length > 0) {
                                 attHtml = '<div class="attachments-grid">' +
                                     r.attachments.map(function(att) {
-                                        return '<img src="' + att + '" class="attachment-thumb" onclick="window.open(this.src)">';
+                                        return '<img src="' + att + '" class="attachment-thumb" onclick="window.catblackOpenLightbox(this.src)">';
                                     }).join('') +
                                     '</div>';
                             }
@@ -1797,7 +1925,6 @@
                     '<textarea id="resp-' + realIndex + '" rows="3" placeholder="Digite a resposta..."></textarea>' +
                     '<label>Próximo enigma ou instrução:</label>' +
                     '<textarea id="puz-' + realIndex + '" rows="2" placeholder="Digite o próximo desdobramento..."></textarea>' +
-                    '<span class="more-btn" onclick="window.catblackToggleMore(' + realIndex + ')">Mais</span>' +
                     '<div class="expandable-area" id="expand-' + realIndex + '">' +
                     '<div class="file-input-wrap">' +
                     '<input type="file" id="file-' + realIndex + '" accept="image/*" multiple onchange="window.catblackHandleFileSelect(this,' + realIndex + ')">' +
@@ -1805,6 +1932,7 @@
                     previewHtml +
                     '</div>' +
                     '<button onclick="window.catblackSaveResponse(' + realIndex + ')">Vincular Resposta à Chave</button>' +
+                    '<span class="more-btn" onclick="window.catblackToggleMore(' + realIndex + ')">Mais</span>' +
                     '</div>' +
                     '</div>' +
                     warningHtml +
